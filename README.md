@@ -28,5 +28,9 @@ See `docs/AUTOMATION-PLAN.md` for the current feasibility assessment and
 The consolidated development scope, quality-ammo design and update strategy are in
 `docs/DEVELOPMENT-SPEC.md`.
 
+Use `docs/PROJECT-DEVELOPMENT-PROMPT.md` as the starting prompt in the project
+development conversation. It keeps implementation scope open and requires a pause
+for unresolved design decisions.
+
 For adding another gunpack without rewriting the processing chain, use
 `docs/GUNPACK-RECIPE-INTERFACE.md` and `docs/GUNPACK-RECIPE-TEMPLATE.js`.
