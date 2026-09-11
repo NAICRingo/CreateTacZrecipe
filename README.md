@@ -24,3 +24,6 @@ powershell -ExecutionPolicy Bypass -File .\tools\Deploy-KubeJsModule.ps1
 
 See `docs/AUTOMATION-PLAN.md` for the current feasibility assessment and
 `docs/AMMO-9MM-PROTOTYPE.md` for the implemented recipe chain, balance and test record.
+
+For adding another gunpack without rewriting the processing chain, use
+`docs/GUNPACK-RECIPE-INTERFACE.md` and `docs/GUNPACK-RECIPE-TEMPLATE.js`.
