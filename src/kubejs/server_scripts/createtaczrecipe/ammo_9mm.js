@@ -1,20 +1,20 @@
 ServerEvents.recipes((event) => {
-  const add = (id, recipe) => event.custom(recipe).id(`lo2900r:${id}`);
+  const add = (id, recipe) => event.custom(recipe).id(`createtaczrecipe:${id}`);
 
   // New gunpacks can be added by copying this spec and changing only IDs,
   // tags, counts and the final TaCZ AmmoId.
   const ammo = {
     key: "9mm",
-    casingMold: "lo2900r_9mm_casing",
-    bulletMold: "lo2900r_9mm_bullet",
-    casingBlankTag: "lo2900r:metal_blanks/brass",
-    bulletBlankTag: "lo2900r:metal_blanks/copper",
-    casing: "lo2900r:empty_9mm_casing",
-    roughBullet: "lo2900r:rough_9mm_bullet",
-    polishedBullet: "lo2900r:polished_9mm_bullet",
-    primer: "lo2900r:small_arms_primer",
-    propellant: "lo2900r:light_propellant_charge",
-    transitional: "lo2900r:incomplete_9mm_round",
+    casingMold: "createtaczrecipe_9mm_casing",
+    bulletMold: "createtaczrecipe_9mm_bullet",
+    casingBlankTag: "createtaczrecipe:metal_blanks/brass",
+    bulletBlankTag: "createtaczrecipe:metal_blanks/copper",
+    casing: "createtaczrecipe:empty_9mm_casing",
+    roughBullet: "createtaczrecipe:rough_9mm_bullet",
+    polishedBullet: "createtaczrecipe:polished_9mm_bullet",
+    primer: "createtaczrecipe:small_arms_primer",
+    propellant: "createtaczrecipe:light_propellant_charge",
+    transitional: "createtaczrecipe:incomplete_9mm_round",
     final: "tacz:ammo",
     ammoId: "tacz:9mm",
   };

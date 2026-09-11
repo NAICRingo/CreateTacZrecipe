@@ -1,6 +1,6 @@
 # 枪包配方接口
 
-`src/kubejs/server_scripts/lo2900r/ammo_9mm.js` 顶部的 `ammo` 对象是新增枪包
+`src/kubejs/server_scripts/createtaczrecipe/ammo_9mm.js` 顶部的 `ammo` 对象是新增枪包
 弹药的统一入口。复制一份对象，修改其中的 ID、材料标签和 `ammoId`，再为它
 补充同样的注册调用即可，不需要重写序列组装步骤。
 
@@ -18,7 +18,7 @@
 | `ammoId` | TaCZ 弹药标识，例如 `tacz:9mm` 或枪包自定义值 |
 
 材料来源应优先使用 `c:` 或项目自己的标签，避免绑定到某个整合包版本的单一
-物品 ID。每个中间物品都可以在 `src/kubejs/startup_scripts/lo2900r/` 中注册，
+物品 ID。每个中间物品都可以在 `src/kubejs/startup_scripts/createtaczrecipe/` 中注册，
 并在 `src/kubejs/assets/` 下提供自定义模型和贴图。
 
 ## 贴图与表现

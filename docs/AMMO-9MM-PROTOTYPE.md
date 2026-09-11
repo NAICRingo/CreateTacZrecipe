@@ -3,8 +3,8 @@
 ## Test boundary
 
 - Source instance: `C:\PCL\.minecraft\versions\Mechanomania11120`
-- Isolated instance: `C:\PCL\.minecraft\versions\Mechanomania11120-LO2900R-Test`
-- Project namespace: `lo2900r`
+- Isolated instance: `C:\PCL\.minecraft\versions\Mechanomania11120-CreateTacZrecipe-Test`
+- Project namespace: `createtaczrecipe`
 - Tested on: 2026-09-11
 
 The source instance is not a deployment target. `tools/Deploy-KubeJsModule.ps1`
@@ -29,7 +29,7 @@ The consumable chain is:
 7. Output one `tacz:ammo` carrying `AmmoId: tacz:9mm`.
 
 The current metal-blank tags point to Create Deco coins. They are deliberately
-abstracted behind `lo2900r:metal_blanks/*`, so a later pack update can replace the
+abstracted behind `createtaczrecipe:metal_blanks/*`, so a later pack update can replace the
 coin input with another blank or stamped part without rewriting every recipe.
 `ultramarine:copper_cash_coin` is not used because it is active merchant currency.
 
@@ -72,4 +72,4 @@ gameplay test must still confirm:
 3. Let the dependency checks stop deployment if a relevant mod version no longer matches.
 4. Test startup, recipe reload and a copied world before changing the main instance.
 5. Update tags or individual adapters when item IDs change; keep recipe IDs and the
-   `lo2900r` namespace stable whenever possible.
+   `createtaczrecipe` namespace stable whenever possible.

@@ -9,6 +9,6 @@ StartupEvents.registry("item", (event) => {
   ];
 
   items.forEach(([id, texture]) => {
-    event.create(`lo2900r:${id}`).texture(texture).maxStackSize(64);
+    event.create(`createtaczrecipe:${id}`).texture(texture).maxStackSize(64);
   });
 });

@@ -1,4 +1,4 @@
-# LO2900R
+# CreateTacZrecipe
 
 TaCZ integration and automation project for Mechanomania, using The Legend Of 2900 as a behavioral and recipe reference.
 
@@ -12,7 +12,7 @@ TaCZ integration and automation project for Mechanomania, using The Legend Of 29
 
 ## Current state
 
-The first isolated prototype implements a 9mm component chain and Create sequenced assembly under `src/kubejs/`. It is deployed only to the cloned `Mechanomania11120-LO2900R-Test` instance. The original TaCZ gunsmith recipe remains available.
+The first isolated prototype implements a 9mm component chain and Create sequenced assembly under `src/kubejs/`. It is deployed only to the cloned `Mechanomania11120-CreateTacZrecipe-Test` instance. The original TaCZ gunsmith recipe remains available.
 
 Deploy the owned module files with:
 

@@ -1,0 +1,10 @@
+{
+  "item.createtaczrecipe.empty_9mm_casing": "Empty 9mm Casing",
+  "item.createtaczrecipe.rough_9mm_bullet": "Rough 9mm Bullet",
+  "item.createtaczrecipe.polished_9mm_bullet": "Polished 9mm Bullet",
+  "item.createtaczrecipe.small_arms_primer": "Small Arms Primer",
+  "item.createtaczrecipe.light_propellant_charge": "Light Propellant Charge",
+  "item.createtaczrecipe.incomplete_9mm_round": "Incomplete 9mm Round",
+  "mold.kubejs.createtaczrecipe_9mm_casing": "9mm Casing Mold",
+  "mold.kubejs.createtaczrecipe_9mm_bullet": "9mm Bullet Mold"
+}

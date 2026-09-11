@@ -1,6 +1,6 @@
 param(
     [Parameter(Mandatory = $false)]
-    [string]$InstancePath = "C:\PCL\.minecraft\versions\Mechanomania11120-LO2900R-Test"
+    [string]$InstancePath = "C:\PCL\.minecraft\versions\Mechanomania11120-CreateTacZrecipe-Test"
 )
 
 $ErrorActionPreference = "Stop"
@@ -36,4 +36,4 @@ Get-ChildItem -LiteralPath $sourcePath -Recurse -File | ForEach-Object {
     Write-Host "Deployed $relativePath"
 }
 
-Write-Host "LO2900R KubeJS module deployed to $resolvedInstance"
+Write-Host "CreateTacZrecipe KubeJS module deployed to $resolvedInstance"

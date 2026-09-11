@@ -1,5 +1,5 @@
 {
-  "id": "lo2900r-ammo-prototype",
+  "id": "createtaczrecipe-ammo-prototype",
   "version": "0.1.0",
   "minecraft": "1.21.1",
   "requiredMods": [
@@ -9,5 +9,5 @@
     "createdieselgenerators",
     "tacz"
   ],
-  "testedInstance": "Mechanomania11120-LO2900R-Test"
+  "testedInstance": "Mechanomania11120-CreateTacZrecipe-Test"
 }

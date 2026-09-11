@@ -26,7 +26,7 @@ It is not a direct dependency for the current project: published builds target M
 1. [ ] Inventory every currently enabled gun and ammunition identifier.
 2. [ ] Select the allowed weapon set and progression tiers.
 3. [ ] Define explicit material costs for the TaCZ default and Create Armorer ammunition.
-4. [x] Implement the first 9mm chain in the isolated `lo2900r` KubeJS namespace.
+4. [x] Implement the first 9mm chain in the isolated `createtaczrecipe` KubeJS namespace.
 5. [x] Verify startup, recipe reload and world loading in the cloned test instance.
 6. [ ] Verify the complete 9mm production line and resulting ammunition in normal gameplay.
 7. [ ] Add gun assembly recipes only after ammunition production passes the gameplay test.
