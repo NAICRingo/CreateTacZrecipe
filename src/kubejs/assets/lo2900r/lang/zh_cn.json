@@ -1,0 +1,10 @@
+{
+  "item.lo2900r.empty_9mm_casing": "9毫米空弹壳",
+  "item.lo2900r.rough_9mm_bullet": "9毫米粗制弹头",
+  "item.lo2900r.polished_9mm_bullet": "9毫米抛光弹头",
+  "item.lo2900r.small_arms_primer": "小型枪械底火",
+  "item.lo2900r.light_propellant_charge": "轻型定量装药",
+  "item.lo2900r.incomplete_9mm_round": "未完成的9毫米弹药",
+  "mold.kubejs.lo2900r_9mm_casing": "9毫米弹壳模具",
+  "mold.kubejs.lo2900r_9mm_bullet": "9毫米弹头模具"
+}
