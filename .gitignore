@@ -1,6 +1,10 @@
 # Public repository contains recipe sources and docs, not local binaries.
 **/*.jar
 **/*.zip
+.gradle/
+!gradle/wrapper/gradle-wrapper.jar
+build/
+run/
 references/instance-snapshot/logs/
 references/instance-snapshot/crash-reports/
 references/instance-snapshot/debug/
