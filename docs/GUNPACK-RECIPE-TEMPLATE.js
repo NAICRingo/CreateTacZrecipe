@@ -14,10 +14,12 @@ const exampleAmmo = {
   transitional: "createtaczrecipe:incomplete_example_round",
   final: "tacz:ammo",
   ammoId: "example_pack:example_ammo",
-  polishing: { input: { item: "createtaczrecipe:rough_example_bullet" }, output: { id: "createtaczrecipe:polished_example_bullet" } },
+  polishing: { input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
+  primerRecipe: { type: "create:pressing", ingredients: [{ tag: "c:nuggets/iron" }], results: [{ ref: "primer", count: 10 }] },
+  propellantRecipe: { type: "create:mixing", ingredients: [{ tag: "c:gunpowders" }], results: [{ ref: "propellant", count: 25 }] },
   operations: [
-    { type: "create:deploying", ingredients: [{ item: "createtaczrecipe:incomplete_example_round" }, { item: "createtaczrecipe:small_arms_primer" }], results: [{ id: "createtaczrecipe:incomplete_example_round" }] },
-    { type: "create:cutting", ingredients: [{ item: "createtaczrecipe:incomplete_example_round" }], results: [{ id: "createtaczrecipe:incomplete_example_round" }] },
-    { type: "create:pressing", ingredients: [{ item: "createtaczrecipe:incomplete_example_round" }], results: [{ id: "createtaczrecipe:incomplete_example_round" }] },
+    { type: "create:deploying", keep_held_item: true, ingredients: [{ ref: "transitional" }, { ref: "primer" }], results: [{ ref: "transitional" }] },
+    { type: "create:cutting", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
+    { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
   ],
 };
