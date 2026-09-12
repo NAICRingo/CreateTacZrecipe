@@ -12,12 +12,15 @@ standardCalibers.forEach((row) => {
   const roughBullet = row[2];
   const powderCount = row[3];
   const sourceBatch = row[4];
+  const extraOperations = (key === "57x28" || key === "500mag" || key === "50ae" || key === "308" || key === "338" || key === "45_70" || key === "50bmg") ? [{ type: "create:deploying", ingredients: [{ ref: "transitional" }, { item: "minecraft:lapis_lazuli", count: key === "50bmg" ? 12 : 1 }], results: [{ ref: "transitional" }] }] : [];
+  if (key === "50bmg") extraOperations.push({ type: "create:deploying", ingredients: [{ ref: "transitional" }, { item: "minecraft:blaze_rod" }], results: [{ ref: "transitional" }] });
   global.createtaczrecipe.registerAmmo(global.createtaczrecipe.standardAmmo({
     key: key,
     ammoId: `tacz:${key}`,
     counts: { casing: casing, roughBullet: roughBullet },
     powderCount: powderCount,
     sourceBatch: sourceBatch,
+    extraOperations: extraOperations,
     casingMaterialTag: `createtaczrecipe:metal_blanks/${key}/brass`,
     bulletMaterialTag: `createtaczrecipe:metal_blanks/${key}/copper`,
   }));

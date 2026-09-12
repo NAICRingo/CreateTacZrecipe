@@ -13,6 +13,8 @@ const standardAmmo = (spec) => {
   const transitional = spec.transitional || `createtaczrecipe:incomplete_${key}_round`;
   const brassTag = spec.casingMaterialTag || `createtaczrecipe:metal_blanks/${key}/brass`;
   const copperTag = spec.bulletMaterialTag || `createtaczrecipe:metal_blanks/${key}/copper`;
+  const casingInput = spec.inputIngredient && spec.inputIngredient.casing ? spec.inputIngredient.casing : { tag: `createtaczrecipe:casings/empty/${key}` };
+  const bulletInput = spec.inputIngredient && spec.inputIngredient.polishedBullet ? spec.inputIngredient.polishedBullet : { tag: `createtaczrecipe:projectiles/polished/${key}` };
   const casingMold = spec.casingMold || `createtaczrecipe_${key}_casing`;
   const bulletMold = spec.bulletMold || `createtaczrecipe_${key}_bullet`;
   const primer = spec.primer || "createtaczrecipe:small_arms_primer";
@@ -29,6 +31,8 @@ const standardAmmo = (spec) => {
       casing: spec.casingMaterial || { tag: brassTag },
       bullet: spec.bulletMaterial || { tag: copperTag },
     },
+    inputIngredient: { casing: casingInput, polishedBullet: bulletInput },
+    outputItem: { casing: casing, roughBullet: roughBullet, polishedBullet: polishedBullet, transitional: transitional },
     counts: spec.counts || { casing: 1, roughBullet: 1 },
     casing: casing,
     roughBullet: roughBullet,
@@ -52,9 +56,9 @@ const standardAmmo = (spec) => {
     operations: spec.operations || [
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "primer" }], results: [{ ref: "transitional" }] },
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "propellant" }], results: [{ ref: "transitional" }] },
-      { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "polishedBullet" }], results: [{ ref: "transitional" }] },
+      { type: "create:deploying", ingredients: [{ ref: "transitional" }, bulletInput], results: [{ ref: "transitional" }] },
       { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
-    ],
+    ].concat(spec.extraOperations || []),
   };
 };
 
