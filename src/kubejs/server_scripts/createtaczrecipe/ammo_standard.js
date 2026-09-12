@@ -14,15 +14,15 @@ standardCalibers.forEach((row) => {
   const sourceBatch = row[4];
   const metalUnits = row[5];
   const lapis = { "57x28": 5, "500mag": 5, "50ae": 5, "308": 1, "338": 4, "45_70": 5, "50bmg": 12 }[key] || 0;
-  const extraOperations = lapis ? [{ type: "create:deploying", ingredients: [{ ref: "transitional" }, { item: "minecraft:lapis_lazuli", count: Math.max(1, Math.ceil(lapis / row[4])) }], results: [{ ref: "transitional" }] }] : [];
-  if (key === "50bmg") extraOperations.push({ type: "create:deploying", ingredients: [{ ref: "transitional" }, { item: "minecraft:blaze_rod" }], results: [{ ref: "transitional" }] });
+  const propellantExtraIngredients = lapis ? [{ item: "minecraft:lapis_lazuli", count: lapis }] : [];
+  if (key === "50bmg") propellantExtraIngredients.push({ item: "minecraft:blaze_rod", count: 1 });
   global.createtaczrecipe.registerAmmo(global.createtaczrecipe.standardAmmo({
     key: key,
     ammoId: `tacz:${key}`,
     counts: { casing: sourceBatch, roughBullet: sourceBatch * roughBullet }, metalUnits: metalUnits,
     powderCount: powderCount,
     sourceBatch: sourceBatch,
-    extraOperations: extraOperations,
+    propellantExtraIngredients: propellantExtraIngredients,
     chargeLevel: powderCount >= 8 ? "heavy" : "standard",
   }));
 });

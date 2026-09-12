@@ -20,6 +20,7 @@ const standardAmmo = (spec) => {
   const primer = spec.primer || "createtaczrecipe:small_arms_primer";
   const chargeLevel = spec.chargeLevel || (spec.powderCount && spec.powderCount >= 8 ? "heavy" : (spec.powderCount && spec.powderCount >= 3 ? "standard" : "light"));
   const propellant = spec.propellant || `createtaczrecipe:${chargeLevel}_propellant_charge`;
+  const propellantIngredients = [{ tag: "createtaczrecipe:materials/propellants", count: spec.powderCount || 2 }].concat(spec.propellantExtraIngredients || []);
   const primerInput = spec.inputIngredient && spec.inputIngredient.primer ? spec.inputIngredient.primer : { tag: "createtaczrecipe:materials/primers" };
   const propellantInput = spec.inputIngredient && spec.inputIngredient.propellant ? spec.inputIngredient.propellant : { tag: `createtaczrecipe:propellants/${chargeLevel}` };
   const sourceBatch = spec.sourceBatch || 50;
@@ -58,7 +59,7 @@ const standardAmmo = (spec) => {
     },
     propellantRecipe: spec.propellantRecipe || {
       type: "create:mixing",
-      ingredients: [{ tag: "createtaczrecipe:materials/propellants", count: spec.powderCount || 2 }],
+      ingredients: propellantIngredients,
       results: [{ ref: "propellant", count: sourceBatch }],
     },
     operations: spec.operations || [
