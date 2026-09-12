@@ -19,6 +19,7 @@ const standardAmmo = (spec) => {
   const bulletMold = spec.bulletMold || `createtaczrecipe_${key}_bullet`;
   const primer = spec.primer || "createtaczrecipe:small_arms_primer";
   const propellant = spec.propellant || "createtaczrecipe:light_propellant_charge";
+  const sourceBatch = spec.sourceBatch || 50;
   return {
     key: key,
     casingMold: casingMold,
@@ -34,6 +35,7 @@ const standardAmmo = (spec) => {
     inputIngredient: { casing: casingInput, polishedBullet: bulletInput },
     outputItem: { casing: casing, roughBullet: roughBullet, polishedBullet: polishedBullet, transitional: transitional },
     counts: spec.counts || { casing: 1, roughBullet: 1 },
+    economy: { sourceBatch: sourceBatch, powderUnits: spec.powderCount || 2, assemblyOutputCount: spec.assemblyOutputCount || 1 },
     casing: casing,
     roughBullet: roughBullet,
     polishedBullet: polishedBullet,
@@ -51,14 +53,15 @@ const standardAmmo = (spec) => {
     propellantRecipe: spec.propellantRecipe || {
       type: "create:mixing",
       ingredients: [{ tag: "c:gunpowders", count: spec.powderCount || 2 }],
-      results: [{ ref: "propellant", count: 25 }],
+      results: [{ ref: "propellant", count: sourceBatch }],
     },
     operations: spec.operations || [
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "primer" }], results: [{ ref: "transitional" }] },
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "propellant" }], results: [{ ref: "transitional" }] },
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, bulletInput], results: [{ ref: "transitional" }] },
+    ].concat(spec.extraOperations || [], [
       { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
-    ].concat(spec.extraOperations || []),
+    ]),
   };
 };
 
