@@ -1,11 +1,11 @@
 StartupEvents.registry("item", (event) => {
   const items = [
-    ["empty_9mm_casing", "createdeco:item/brass_coin"],
-    ["rough_9mm_bullet", "createdeco:item/copper_coin"],
-    ["polished_9mm_bullet", "minecraft:item/copper_ingot"],
-    ["small_arms_primer", "minecraft:item/iron_nugget"],
-    ["light_propellant_charge", "minecraft:item/gunpowder"],
-    ["incomplete_9mm_round", "createdeco:item/brass_coin"],
+    ["empty_9mm_casing", "kubejs:item/createtaczrecipe_empty_9mm_casing"],
+    ["rough_9mm_bullet", "kubejs:item/createtaczrecipe_rough_9mm_bullet"],
+    ["polished_9mm_bullet", "kubejs:item/createtaczrecipe_polished_9mm_bullet"],
+    ["small_arms_primer", "kubejs:item/createtaczrecipe_small_arms_primer"],
+    ["light_propellant_charge", "kubejs:item/createtaczrecipe_light_propellant_charge"],
+    ["incomplete_9mm_round", "kubejs:item/createtaczrecipe_incomplete_9mm_round"],
   ];
 
   items.forEach(([id, texture]) => {

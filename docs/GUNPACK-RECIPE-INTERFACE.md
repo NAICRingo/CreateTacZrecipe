@@ -1,43 +1,27 @@
-# 枪包配方接口
+# 枪包弹药配方接口
 
-`src/kubejs/server_scripts/createtaczrecipe/ammo_9mm.js` 顶部的 `ammo` 对象是新增枪包
-弹药的统一入口。复制一份对象，修改其中的 ID、材料标签和 `ammoId`，再为它
-补充同样的注册调用即可，不需要重写序列组装步骤。
+通用生成器位于 `src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js`。
+口径脚本只负责声明数据并调用 `global.createtaczrecipe.registerAmmo(definition)`；9mm
+示例位于同目录的 `ammo_9mm.js`。`docs/GUNPACK-RECIPE-TEMPLATE.js` 是不会实际加载的示例定义。
 
-## 字段
+## 定义字段
 
-| 字段 | 用途 |
-| --- | --- |
-| `key` | 配方路径的短名，例如 `45acp`、`12g` |
-| `casingMold` / `bulletMold` | Create Diesel Generators 模具类型 |
-| `casing` | 空弹壳物品 ID |
-| `roughBullet` / `polishedBullet` | 粗制、抛光弹头 ID |
-| `primer` / `propellant` | 底火和定量装药 ID |
-| `transitional` | 序列组装过程中的中间物品 ID |
-| `final` | 成品物品，通常是 `tacz:ammo` |
-| `ammoId` | TaCZ 弹药标识，例如 `tacz:9mm` 或枪包自定义值 |
+- `key`：弹药短名，用于生成 `createtaczrecipe:*` 配方 ID。
+- `materials.casing`、`materials.bullet`：物品或标签输入，例如 `{tag: "c:plates/brass"}`。
+- `counts`：`casing` 和 `roughBullet` 的成型产量。
+- `casingMold`、`bulletMold`：CDG 模具类型；模具是 Basin 配方的专用输入，不是普通消耗材料。
+- `casing`、`roughBullet`、`polishedBullet`、`primer`、`propellant`、`transitional`：中间物品。
+- `polishing`：砂纸配方输入和输出。
+- `primerRecipe`、`propellantRecipe`：底火和装药的完整 Create 配方对象。
+- `operations`：序列组装步骤数组。当前允许 `create:deploying`、`create:pressing`、`create:cutting`、
+  `create:mixing`、`create:sandpaper_polishing` 和 `createdieselgenerators:compression_molding`，
+  每步包含 `ingredients` 与 `results`。
+- `final`、`ammoId`：成品物品和 TaCZ AmmoId。成品自动写入 `minecraft:custom_data.AmmoId`。
 
-材料来源应优先使用 `c:` 或项目自己的标签，避免绑定到某个整合包版本的单一
-物品 ID。每个中间物品都可以在 `src/kubejs/startup_scripts/createtaczrecipe/` 中注册，
-并在 `src/kubejs/assets/` 下提供自定义模型和贴图。
+缺字段、非法工序或重复配方 ID 会记录 `[CreateTacZrecipe]` 日志并跳过该定义/配方，不会阻止其他口径加载。
 
-## 贴图与表现
+## 装配实现参考
 
-中间物品贴图放在：
-
-```text
-src/kubejs/assets/<namespace>/textures/item/<name>.png
-```
-
-在 `ammo_items.js` 的 `.texture("<namespace>:item/<name>")` 中引用。这样可以
-替换空弹壳、粗制弹头、装药和未完成弹药的外观，而不影响配方逻辑。建议使用
-16x16 或 32x32 PNG，并保留旧文件名作为兼容别名，方便整合包更新后继续使用。
-
-## 新增枪包流程
-
-1. 从 `ammo` 对象复制模板并填写枪包的 `AmmoId`。
-2. 在 `ammo_items.js` 添加中间物品和贴图引用。
-3. 在 `ammo_tags.js` 添加材料标签映射。
-4. 用 KubeJS 重载并在 JEI 中检查每个阶段，再测试机械手逐件加工。
-
-接口只描述数据和配方，不复制枪包本体；枪包仍需由用户按其许可证单独安装。
+测试整合包中的“傀儡装配”参考对象是 `modulargolems-3.1.43.jar`，不是
+Kaleidoscope。它只用于观察自定义输入、输出和中间状态的组织方式；本项目仍使用
+Create 的序列组装配方，不添加 ModularGolems 依赖，也不复制其 Java 实现。
