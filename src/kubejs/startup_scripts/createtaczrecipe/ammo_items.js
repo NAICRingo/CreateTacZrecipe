@@ -7,6 +7,21 @@ StartupEvents.registry("item", (event) => {
     ["light_propellant_charge", "kubejs:item/createtaczrecipe_light_propellant_charge"],
     ["incomplete_9mm_round", "kubejs:item/createtaczrecipe_incomplete_9mm_round"],
   ];
+  global.createtaczrecipe.caliberKeys.forEach((key) => {
+    if (key === "9mm") return;
+    items.push([`empty_${key}_casing`, "kubejs:item/createtaczrecipe_empty_9mm_casing"]);
+    items.push([`rough_${key}_bullet`, "kubejs:item/createtaczrecipe_rough_9mm_bullet"]);
+    items.push([`polished_${key}_bullet`, "kubejs:item/createtaczrecipe_polished_9mm_bullet"]);
+    items.push([`incomplete_${key}_round`, "kubejs:item/createtaczrecipe_incomplete_9mm_round"]);
+  });
+
+  global.createtaczrecipe.caliberKeys.forEach((key) => {
+    if (key === "9mm") return;
+    items.push([`empty_${key}_casing`, "kubejs:item/createtaczrecipe_empty_9mm_casing"]);
+    items.push([`rough_${key}_bullet`, "kubejs:item/createtaczrecipe_rough_9mm_bullet"]);
+    items.push([`polished_${key}_bullet`, "kubejs:item/createtaczrecipe_polished_9mm_bullet"]);
+    items.push([`incomplete_${key}_round`, "kubejs:item/createtaczrecipe_incomplete_9mm_round"]);
+  });
 
   items.forEach(([id, texture]) => {
     event.create(`createtaczrecipe:${id}`).texture(texture).maxStackSize(64);

@@ -2,6 +2,7 @@
 (() => {
   // These are the Create operation types supported inside sequenced assembly here.
   const allowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true };
+  const componentAllowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true, "create:mixing": true, "create:sandpaper_polishing": true, "createdieselgenerators:compression_molding": true };
   let seen = {};
   const log = (message) => console.log(`[CreateTacZrecipe] ${message}`);
   const hasText = (value) => typeof value === "string" && value.length > 0;
@@ -40,6 +41,13 @@
     if (!Array.isArray(step.results) || step.results.some((item) => !validResult(item))) { log(`skipped ${key}: invalid results at operation ${index}`); return false; }
     return true;
   };
+  const validateComponent = (recipe, name, key) => {
+    if (!recipe) return true;
+    if (!recipe.type || !componentAllowed[recipe.type]) { log(`skipped ${key}: unsupported ${name} recipe type ${recipe.type}`); return false; }
+    if (recipe.ingredients && (!Array.isArray(recipe.ingredients) || recipe.ingredients.some((item) => !validIngredient(item)))) { log(`skipped ${key}: invalid ${name} ingredients`); return false; }
+    if (recipe.results && (!Array.isArray(recipe.results) || recipe.results.some((item) => !validResult(item)))) { log(`skipped ${key}: invalid ${name} results`); return false; }
+    return true;
+  };
   const validate = (ammo) => {
     if (!ammo || typeof ammo !== "object") {
       log("skipped definition: expected an object");
@@ -51,6 +59,8 @@
     const outputs = [ammo.casing, ammo.roughBullet, ammo.polishedBullet, ammo.primer, ammo.propellant, ammo.transitional, ammo.final];
     const absent = outputs.filter((id) => !itemExists(id));
     if (absent.length) { log(`skipped ${ammo.key}: output item(s) not found: ${absent.join(", ")}`); return false; }
+    if (!ammo.moldMaterials || !Array.isArray(ammo.moldMaterials.casing) || !Array.isArray(ammo.moldMaterials.bullet)) { log(`skipped ${ammo.key}: moldMaterials.casing and moldMaterials.bullet are required arrays`); return false; }
+    if (!validateComponent(ammo.polishing, "polishing", ammo.key) || !validateComponent(ammo.primerRecipe, "primer", ammo.key) || !validateComponent(ammo.propellantRecipe, "propellant", ammo.key)) return false;
     for (let i = 0; i < ammo.operations.length; i++) if (!validateStep(ammo.operations[i], i, ammo.key)) return false;
     return true;
   };
@@ -60,8 +70,8 @@
       if (!validate(ammo)) return;
       const base = `ammo/${ammo.key}`;
       let registered = 0;
-      if (emit(event, `molds/${ammo.key}_casing`, { type: "minecraft:crafting_shapeless", ingredients: [{ tag: "c:plates/iron" }, { item: "createdeco:brass_coin" }], result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.casingMold}` } } })) registered++;
-      if (emit(event, `molds/${ammo.key}_bullet`, { type: "minecraft:crafting_shapeless", ingredients: [{ tag: "c:plates/iron" }, { item: "createdeco:copper_coin" }], result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.bulletMold}` } } })) registered++;
+      if (emit(event, `molds/${ammo.key}_casing`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.casing, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.casingMold}` } } })) registered++;
+      if (emit(event, `molds/${ammo.key}_bullet`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.bullet, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.bulletMold}` } } })) registered++;
       if (emit(event, `components/${ammo.key}_casing`, { type: "createdieselgenerators:compression_molding", ingredients: [ammo.materials.casing], mold: `kubejs:${ammo.casingMold}`, results: [{ id: ammo.casing, count: ammo.counts && ammo.counts.casing || 1 }] })) registered++;
       if (emit(event, `components/${ammo.key}_rough_bullet`, { type: "createdieselgenerators:compression_molding", ingredients: [ammo.materials.bullet], mold: `kubejs:${ammo.bulletMold}`, results: [{ id: ammo.roughBullet, count: ammo.counts && ammo.counts.roughBullet || 1 }] })) registered++;
       if (ammo.polishing && emit(event, `components/${ammo.key}_polishing`, { type: "create:sandpaper_polishing", ingredients: [resolveStack(ammo.polishing.input, ammo, false)], results: [resolveStack(ammo.polishing.output, ammo, true)] })) registered++;

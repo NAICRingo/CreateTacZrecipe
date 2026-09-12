@@ -2,13 +2,14 @@
 
 通用生成器位于 `src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js`。
 口径脚本只负责声明数据并调用 `global.createtaczrecipe.registerAmmo(definition)`；9mm
-示例位于同目录的 `ammo_9mm.js`。`docs/GUNPACK-RECIPE-TEMPLATE.js` 是不会实际加载的示例定义。
+示例位于同目录的 `ammo_9mm.js`，默认常规口径位于 `ammo_standard.js`。`docs/GUNPACK-RECIPE-TEMPLATE.js` 是不会实际加载的示例定义。
 
 ## 定义字段
 
 - `key`：弹药短名，用于生成 `createtaczrecipe:*` 配方 ID。
 - `materials.casing`、`materials.bullet`：物品或标签输入，例如 `{tag: "c:plates/brass"}`。
 - `counts`：`casing` 和 `roughBullet` 的成型产量。
+- `moldMaterials.casing`、`moldMaterials.bullet`：制作 CDG 模具的配方输入；不再由生成器写死。
 - `casingMold`、`bulletMold`：CDG 模具类型；模具是 Basin 配方的专用输入，不是普通消耗材料。
 - `casing`、`roughBullet`、`polishedBullet`、`primer`、`propellant`、`transitional`：中间物品。
 - 以上字段可以直接改为已安装模组的物品 ID；框架会直接使用该物品，不生成转换配方。
@@ -34,8 +35,20 @@
 - `createtaczrecipe:propellants/light`
 - `createtaczrecipe:cartridges/incomplete`
 
-材料输入继续使用 `createtaczrecipe:metal_blanks/*` 标签。这样可以替换中间物品，
-也可以让其他模组的同用途物品通过标签参与后续配方，而不强制使用本项目物品。
+材料输入继续使用 `createtaczrecipe:metal_blanks/<key>/brass` 和 `/copper` 等按口径标签，
+避免 9mm 与其他口径混用；`createtaczrecipe:metal_blanks/brass` 等通用标签仍保留给兼容层。
+中间产物还提供通用用途标签及 `createtaczrecipe:<key>/...` 口径标签。将外部物品加入对应标签即可参与输入，
+而 `casing`、`roughBullet`、`polishedBullet`、`primer`、`propellant`、`transitional` 字段仍可直接替换产物 ID。
+
+## 添加常规口径
+
+在 `ammo_standard.js` 的数据表增加 `[key, casingYield, bulletYield, powderCount, sourceBatch]`，
+再调用 `standardAmmo`。`powderCount` 对应 TaCZ 默认枪匠台配方的火药消耗；`sourceBatch` 仅记录原始批量，
+因为 TaCZ 并未规定 CDG 模具的单次壳体/弹头产量。不要为同一 AmmoId 再注册第二条定义。
+
+未来特殊弹药可在 `primerRecipe`、`propellantRecipe` 或独立组件配方中使用已确认的
+`create:mixing`、`create:cutting`、`create:sandpaper_polishing` 等类型；序列工序列表目前只允许
+`create:deploying`、`create:pressing`、`create:cutting`，未经当前 Create 版本验证的类型不会被接受。
 
 ## 外部视觉资源
 

@@ -1,4 +1,6 @@
 CDGEvents.molds((event) => {
-  event.create("createtaczrecipe_9mm_casing", "9mm Casing Mold");
-  event.create("createtaczrecipe_9mm_bullet", "9mm Bullet Mold");
+  global.createtaczrecipe.caliberKeys.forEach((key) => {
+    event.create(`createtaczrecipe_${key}_casing`, `${key} Casing Mold`);
+    event.create(`createtaczrecipe_${key}_bullet`, `${key} Bullet Mold`);
+  });
 });

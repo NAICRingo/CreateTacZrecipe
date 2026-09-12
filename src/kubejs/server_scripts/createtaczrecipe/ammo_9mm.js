@@ -1,25 +1,9 @@
-// 9mm data only. The reusable generator lives in 00_ammo_framework.js.
-global.createtaczrecipe.registerAmmo({
+// The reusable generator lives in 00_ammo_framework.js; this file is the stable 9mm entry point.
+global.createtaczrecipe.registerAmmo(global.createtaczrecipe.standardAmmo({
   key: "9mm",
-  casingMold: "createtaczrecipe_9mm_casing",
-  bulletMold: "createtaczrecipe_9mm_bullet",
-  materials: { casing: { tag: "createtaczrecipe:metal_blanks/brass" }, bullet: { tag: "createtaczrecipe:metal_blanks/copper" } },
   counts: { casing: 1, roughBullet: 2 },
-  casing: "createtaczrecipe:empty_9mm_casing",
-  roughBullet: "createtaczrecipe:rough_9mm_bullet",
-  polishedBullet: "createtaczrecipe:polished_9mm_bullet",
+  casingMaterialTag: "createtaczrecipe:metal_blanks/9mm/brass",
+  bulletMaterialTag: "createtaczrecipe:metal_blanks/9mm/copper",
   primer: "createtaczrecipe:small_arms_primer",
   propellant: "createtaczrecipe:light_propellant_charge",
-  transitional: "createtaczrecipe:incomplete_9mm_round",
-  final: "tacz:ammo",
-  ammoId: "tacz:9mm",
-  polishing: { input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
-  primerRecipe: { type: "create:pressing", ingredients: [{ tag: "c:nuggets/iron" }], results: [{ ref: "primer", count: 10 }] },
-  propellantRecipe: { type: "create:mixing", ingredients: [{ tag: "c:gunpowders" }], results: [{ ref: "propellant", count: 25 }] },
-  operations: [
-    { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "primer" }], results: [{ ref: "transitional" }] },
-    { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "propellant" }], results: [{ ref: "transitional" }] },
-    { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "polishedBullet" }], results: [{ ref: "transitional" }] },
-    { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
-  ],
-});
+}));
