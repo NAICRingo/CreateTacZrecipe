@@ -5,6 +5,8 @@
   "item.createtaczrecipe.incomplete_9mm_round": "未完成的9毫米弹药",
   "item.createtaczrecipe.small_arms_primer": "小型枪械底火",
   "item.createtaczrecipe.light_propellant_charge": "轻型定量装药",
+  "item.createtaczrecipe.standard_propellant_charge": "标准定量装药",
+  "item.createtaczrecipe.heavy_propellant_charge": "重型定量装药",
   "item.createtaczrecipe.empty_22wmr_casing": "22wmr空弹壳",
   "item.createtaczrecipe.rough_22wmr_bullet": "22wmr粗制弹头",
   "item.createtaczrecipe.polished_22wmr_bullet": "22wmr抛光弹头",

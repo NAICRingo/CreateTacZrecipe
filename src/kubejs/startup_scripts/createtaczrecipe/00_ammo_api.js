@@ -11,31 +11,37 @@ const standardAmmo = (spec) => {
   const roughBullet = spec.roughBullet || `createtaczrecipe:rough_${key}_bullet`;
   const polishedBullet = spec.polishedBullet || `createtaczrecipe:polished_${key}_bullet`;
   const transitional = spec.transitional || `createtaczrecipe:incomplete_${key}_round`;
-  const brassTag = spec.casingMaterialTag || `createtaczrecipe:metal_blanks/${key}/brass`;
-  const copperTag = spec.bulletMaterialTag || `createtaczrecipe:metal_blanks/${key}/copper`;
+  const brassTag = spec.casingMaterialTag || "createtaczrecipe:materials/brass_blanks";
+  const copperTag = spec.bulletMaterialTag || "createtaczrecipe:materials/copper_blanks";
   const casingInput = spec.inputIngredient && spec.inputIngredient.casing ? spec.inputIngredient.casing : { tag: `createtaczrecipe:casings/empty/${key}` };
   const bulletInput = spec.inputIngredient && spec.inputIngredient.polishedBullet ? spec.inputIngredient.polishedBullet : { tag: `createtaczrecipe:projectiles/polished/${key}` };
   const casingMold = spec.casingMold || `createtaczrecipe_${key}_casing`;
   const bulletMold = spec.bulletMold || `createtaczrecipe_${key}_bullet`;
   const primer = spec.primer || "createtaczrecipe:small_arms_primer";
-  const propellant = spec.propellant || "createtaczrecipe:light_propellant_charge";
+  const chargeLevel = spec.chargeLevel || (spec.powderCount && spec.powderCount >= 8 ? "heavy" : (spec.powderCount && spec.powderCount >= 3 ? "standard" : "light"));
+  const propellant = spec.propellant || `createtaczrecipe:${chargeLevel}_propellant_charge`;
+  const primerInput = spec.inputIngredient && spec.inputIngredient.primer ? spec.inputIngredient.primer : { tag: "createtaczrecipe:materials/primers" };
+  const propellantInput = spec.inputIngredient && spec.inputIngredient.propellant ? spec.inputIngredient.propellant : { tag: `createtaczrecipe:propellants/${chargeLevel}` };
   const sourceBatch = spec.sourceBatch || 50;
+  const metalUnits = spec.metalUnits || 10;
+  const casingMetalUnits = spec.casingMetalUnits || Math.max(1, Math.ceil(metalUnits / 2));
+  const bulletMetalUnits = spec.bulletMetalUnits || Math.max(1, metalUnits - casingMetalUnits);
   return {
     key: key,
     casingMold: casingMold,
     bulletMold: bulletMold,
     moldMaterials: spec.moldMaterials || {
-      casing: [{ tag: "c:plates/iron" }, { item: "createdeco:brass_coin" }],
-      bullet: [{ tag: "c:plates/iron" }, { item: "createdeco:copper_coin" }],
+      casing: [{ tag: "createtaczrecipe:materials/iron_plates" }, { tag: "createtaczrecipe:materials/brass_blanks" }],
+      bullet: [{ tag: "createtaczrecipe:materials/iron_plates" }, { tag: "createtaczrecipe:materials/copper_blanks" }],
     },
     materials: {
       casing: spec.casingMaterial || { tag: brassTag },
       bullet: spec.bulletMaterial || { tag: copperTag },
     },
-    inputIngredient: { casing: casingInput, polishedBullet: bulletInput },
+    inputIngredient: { casing: casingInput, polishedBullet: bulletInput, primer: primerInput, propellant: propellantInput },
     outputItem: { casing: casing, roughBullet: roughBullet, polishedBullet: polishedBullet, transitional: transitional },
     counts: spec.counts || { casing: 1, roughBullet: 1 },
-    economy: { sourceBatch: sourceBatch, powderUnits: spec.powderCount || 2, assemblyOutputCount: spec.assemblyOutputCount || 1 },
+    economy: { sourceBatch: sourceBatch, metalUnits: metalUnits, casingMetalUnits: casingMetalUnits, bulletMetalUnits: bulletMetalUnits, powderUnits: spec.powderCount || 2, assemblyOutputCount: spec.assemblyOutputCount || 1 },
     casing: casing,
     roughBullet: roughBullet,
     polishedBullet: polishedBullet,
@@ -47,17 +53,17 @@ const standardAmmo = (spec) => {
     polishing: spec.polishing || { input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
     primerRecipe: spec.primerRecipe || {
       type: "create:pressing",
-      ingredients: [{ tag: "c:nuggets/iron" }],
+      ingredients: [{ tag: "createtaczrecipe:materials/iron_plates" }],
       results: [{ ref: "primer", count: 10 }],
     },
     propellantRecipe: spec.propellantRecipe || {
       type: "create:mixing",
-      ingredients: [{ tag: "c:gunpowders", count: spec.powderCount || 2 }],
+      ingredients: [{ tag: "createtaczrecipe:materials/propellants", count: spec.powderCount || 2 }],
       results: [{ ref: "propellant", count: sourceBatch }],
     },
     operations: spec.operations || [
-      { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "primer" }], results: [{ ref: "transitional" }] },
-      { type: "create:deploying", ingredients: [{ ref: "transitional" }, { ref: "propellant" }], results: [{ ref: "transitional" }] },
+      { type: "create:deploying", ingredients: [{ ref: "transitional" }, primerInput], results: [{ ref: "transitional" }] },
+      { type: "create:deploying", ingredients: [{ ref: "transitional" }, propellantInput], results: [{ ref: "transitional" }] },
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, bulletInput], results: [{ ref: "transitional" }] },
     ].concat(spec.extraOperations || [], [
       { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },

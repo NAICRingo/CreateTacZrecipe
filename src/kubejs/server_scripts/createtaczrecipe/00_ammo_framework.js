@@ -21,6 +21,12 @@
     if (recipe.results) resolved.results = recipe.results.map((stack) => resolveStack(stack, ammo, true));
     return resolved;
   };
+  const withCount = (ingredient, count) => {
+    const resolved = {};
+    for (const field in ingredient) resolved[field] = ingredient[field];
+    if (count && !resolved.count) resolved.count = count;
+    return resolved;
+  };
   const itemExists = (id) => {
     try { return !Item.of(id).isEmpty(); } catch (error) { log(`unable to inspect item ${id}: ${error}`); return false; }
   };
@@ -55,7 +61,7 @@
     }
     const required = ["key", "casingMold", "bulletMold", "casing", "roughBullet", "polishedBullet", "primer", "propellant", "transitional", "final", "ammoId"];
     const missing = required.filter((field) => !hasText(ammo[field]));
-    if (missing.length || !ammo.materials || !validIngredient(ammo.materials.casing) || !validIngredient(ammo.materials.bullet) || !Array.isArray(ammo.operations)) { log(`skipped definition: missing or invalid fields (${missing.join(", ") || "materials/operations"})`); return false; }
+    if (missing.length || !ammo.materials || !validIngredient(ammo.materials.casing) || !validIngredient(ammo.materials.bullet) || !ammo.inputIngredient || !validIngredient(ammo.inputIngredient.casing) || !validIngredient(ammo.inputIngredient.polishedBullet) || !validIngredient(ammo.inputIngredient.primer) || !validIngredient(ammo.inputIngredient.propellant) || !Array.isArray(ammo.operations)) { log(`skipped definition: missing or invalid fields (${missing.join(", ") || "materials/inputIngredient/operations"})`); return false; }
     const outputs = [ammo.casing, ammo.roughBullet, ammo.polishedBullet, ammo.primer, ammo.propellant, ammo.transitional, ammo.final];
     const absent = outputs.filter((id) => !itemExists(id));
     if (absent.length) { log(`skipped ${ammo.key}: output item(s) not found: ${absent.join(", ")}`); return false; }
@@ -72,8 +78,8 @@
       let registered = 0;
       if (emit(event, `molds/${ammo.key}_casing`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.casing, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.casingMold}` } } })) registered++;
       if (emit(event, `molds/${ammo.key}_bullet`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.bullet, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.bulletMold}` } } })) registered++;
-      if (emit(event, `components/${ammo.key}_casing`, { type: "createdieselgenerators:compression_molding", ingredients: [ammo.materials.casing], mold: `kubejs:${ammo.casingMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.casing || ammo.casing, count: ammo.counts && ammo.counts.casing || 1 }] })) registered++;
-      if (emit(event, `components/${ammo.key}_rough_bullet`, { type: "createdieselgenerators:compression_molding", ingredients: [ammo.materials.bullet], mold: `kubejs:${ammo.bulletMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.roughBullet || ammo.roughBullet, count: ammo.counts && ammo.counts.roughBullet || 1 }] })) registered++;
+      if (emit(event, `components/${ammo.key}_casing`, { type: "createdieselgenerators:compression_molding", ingredients: [withCount(ammo.materials.casing, ammo.economy && ammo.economy.casingMetalUnits)], mold: `kubejs:${ammo.casingMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.casing || ammo.casing, count: ammo.counts && ammo.counts.casing || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
+      if (emit(event, `components/${ammo.key}_rough_bullet`, { type: "createdieselgenerators:compression_molding", ingredients: [withCount(ammo.materials.bullet, ammo.economy && ammo.economy.bulletMetalUnits)], mold: `kubejs:${ammo.bulletMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.roughBullet || ammo.roughBullet, count: ammo.counts && ammo.counts.roughBullet || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
       if (ammo.polishing && emit(event, `components/${ammo.key}_polishing`, { type: "create:sandpaper_polishing", ingredients: [resolveStack(ammo.polishing.input, ammo, false)], results: [resolveStack(ammo.polishing.output, ammo, true)] })) registered++;
       if (ammo.primerRecipe && emit(event, `components/${ammo.key}_primer`, resolveRecipe(ammo.primerRecipe, ammo))) registered++;
       if (ammo.propellantRecipe && emit(event, `components/${ammo.key}_propellant`, resolveRecipe(ammo.propellantRecipe, ammo))) registered++;
@@ -84,7 +90,7 @@
         operation.results = step.results.map((stack) => resolveStack(stack, ammo, true));
         return operation;
       });
-      if (emit(event, `${base}_sequenced_assembly`, { type: "create:sequenced_assembly", ingredient: ammo.inputIngredient && ammo.inputIngredient.casing || { item: ammo.casing }, transitional_item: { id: ammo.outputItem && ammo.outputItem.transitional || ammo.transitional }, sequence: sequence, results: [{ id: ammo.final, components: { "minecraft:custom_data": { AmmoId: ammo.ammoId } } }] })) registered++;
+      if (emit(event, `${base}_sequenced_assembly`, { type: "create:sequenced_assembly", ingredient: ammo.inputIngredient && ammo.inputIngredient.casing || { item: ammo.casing }, transitional_item: { id: ammo.outputItem && ammo.outputItem.transitional || ammo.transitional }, sequence: sequence, results: [{ id: ammo.final, count: ammo.economy && ammo.economy.assemblyOutputCount || 1, components: { "minecraft:custom_data": { AmmoId: ammo.ammoId } } }] })) registered++;
       log(`registered ${registered} recipes for ammo key ${ammo.key}`);
     });
   });

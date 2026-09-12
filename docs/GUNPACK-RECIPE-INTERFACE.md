@@ -11,6 +11,8 @@
 - `counts`：`casing` 和 `roughBullet` 的成型产量。
 - `sourceBatch`、`powderCount`：原版枪匠台批量与火药单位。框架将 `powderCount` 作为一批定量装药输入，
   将 `sourceBatch` 写入装药批量产出和 `economy` 元数据；它不会被误当作每发消耗。
+- `chargeLevel`：`light`、`standard` 或 `heavy`。三档使用独立装药物品和标签，避免大口径配方
+  通过共用轻装药套利；默认按 TaCZ 火药单位自动分档，9mm 为轻装药、.308 为标准装药、.50 BMG 为重装药。
 - `extraOperations`：在基础的底火→装药→弹头步骤之后、最终压合之前插入额外投入；适用于青金石、烈焰棒等特殊材料。
 - `moldMaterials.casing`、`moldMaterials.bullet`：制作 CDG 模具的配方输入；不再由生成器写死。
 - `casingMold`、`bulletMold`：CDG 模具类型；模具是 Basin 配方的专用输入，不是普通消耗材料。
