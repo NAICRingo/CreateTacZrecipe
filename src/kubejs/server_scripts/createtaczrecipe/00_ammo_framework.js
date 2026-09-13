@@ -8,6 +8,7 @@
   const hasText = (value) => typeof value === "string" && value.length > 0;
   const validIngredient = (value) => value && (hasText(value.item) || hasText(value.tag) || hasText(value.ref));
   const validResult = (value) => value && (hasText(value.id) || hasText(value.ref));
+  const validCount = (value) => value === undefined || (Number.isInteger(value) && value >= 1 && value <= 99);
   const resolveStack = (stack, ammo, result) => {
     const resolved = {};
     for (const field in stack) if (field !== "ref") resolved[field] = stack[field];
@@ -51,7 +52,7 @@
     if (!recipe) return true;
     if (!recipe.type || !componentAllowed[recipe.type]) { log(`skipped ${key}: unsupported ${name} recipe type ${recipe.type}`); return false; }
     if (recipe.ingredients && (!Array.isArray(recipe.ingredients) || recipe.ingredients.some((item) => !validIngredient(item)))) { log(`skipped ${key}: invalid ${name} ingredients`); return false; }
-    if (recipe.results && (!Array.isArray(recipe.results) || recipe.results.some((item) => !validResult(item)))) { log(`skipped ${key}: invalid ${name} results`); return false; }
+    if (recipe.results && (!Array.isArray(recipe.results) || recipe.results.some((item) => !validResult(item) || !validCount(item.count)))) { log(`skipped ${key}: invalid ${name} results/count`); return false; }
     return true;
   };
   const validate = (ammo) => {
@@ -66,6 +67,7 @@
     const absent = outputs.filter((id) => !itemExists(id));
     if (absent.length) { log(`skipped ${ammo.key}: output item(s) not found: ${absent.join(", ")}`); return false; }
     if (!ammo.moldMaterials || !Array.isArray(ammo.moldMaterials.casing) || !Array.isArray(ammo.moldMaterials.bullet)) { log(`skipped ${ammo.key}: moldMaterials.casing and moldMaterials.bullet are required arrays`); return false; }
+    if (!ammo.counts || !validCount(ammo.counts.casing) || !validCount(ammo.counts.roughBullet) || !ammo.economy || !validCount(ammo.economy.sourceBatch)) { log(`skipped ${ammo.key}: result counts must be integers in range 1..99`); return false; }
     if (!validateComponent(ammo.polishing, "polishing", ammo.key) || !validateComponent(ammo.primerRecipe, "primer", ammo.key) || !validateComponent(ammo.propellantRecipe, "propellant", ammo.key)) return false;
     for (let i = 0; i < ammo.operations.length; i++) if (!validateStep(ammo.operations[i], i, ammo.key)) return false;
     return true;
@@ -80,7 +82,7 @@
       if (emit(event, `molds/${ammo.key}_bullet`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.bullet, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.bulletMold}` } } })) registered++;
       if (emit(event, `components/${ammo.key}_casing`, { type: "createdieselgenerators:compression_molding", ingredients: [withCount(ammo.materials.casing, ammo.economy && ammo.economy.casingMetalUnits)], mold: `kubejs:${ammo.casingMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.casing || ammo.casing, count: ammo.counts && ammo.counts.casing || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
       if (emit(event, `components/${ammo.key}_rough_bullet`, { type: "createdieselgenerators:compression_molding", ingredients: [withCount(ammo.materials.bullet, ammo.economy && ammo.economy.bulletMetalUnits)], mold: `kubejs:${ammo.bulletMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.roughBullet || ammo.roughBullet, count: ammo.counts && ammo.counts.roughBullet || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
-      if (ammo.polishing && emit(event, `components/${ammo.key}_polishing`, { type: "create:sandpaper_polishing", ingredients: [resolveStack(ammo.polishing.input, ammo, false)], results: [resolveStack(ammo.polishing.output, ammo, true)] })) registered++;
+      if (ammo.polishing && emit(event, `components/${ammo.key}_polishing`, { type: ammo.polishing.type, ingredients: [resolveStack(ammo.polishing.input, ammo, false)], results: [resolveStack(ammo.polishing.output, ammo, true)] })) registered++;
       if (ammo.primerRecipe && emit(event, `components/${ammo.key}_primer`, resolveRecipe(ammo.primerRecipe, ammo))) registered++;
       if (ammo.propellantRecipe && emit(event, `components/${ammo.key}_propellant`, resolveRecipe(ammo.propellantRecipe, ammo))) registered++;
       const sequence = ammo.operations.map((step) => {

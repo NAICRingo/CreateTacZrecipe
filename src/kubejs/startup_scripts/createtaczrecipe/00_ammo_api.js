@@ -51,7 +51,7 @@ const standardAmmo = (spec) => {
     transitional: transitional,
     final: spec.final || "tacz:ammo",
     ammoId: spec.ammoId || `tacz:${key}`,
-    polishing: spec.polishing || { input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
+    polishing: spec.polishing || { type: "create:sandpaper_polishing", input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
     primerRecipe: spec.primerRecipe || {
       type: "create:pressing",
       ingredients: [{ tag: "createtaczrecipe:materials/iron_plates" }],

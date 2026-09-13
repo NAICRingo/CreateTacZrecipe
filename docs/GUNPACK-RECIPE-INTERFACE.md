@@ -11,6 +11,8 @@
 - `counts`：`casing` 和 `roughBullet` 的成型产量。
 - `sourceBatch`、`powderCount`：原版枪匠台批量与火药单位。框架将 `powderCount` 作为一批定量装药输入，
   将 `sourceBatch` 写入装药批量产出和 `economy` 元数据；它不会被误当作每发消耗。
+  当前 Create/CDG 配方结果遵守 Minecraft 单堆上限 99；因此 22 WMR 的原始 100 发批量转换为 96 发合法批次，
+  不使用未经确认的多结果堆拆分格式。
 - `chargeLevel`：`light`、`standard` 或 `heavy`。三档使用独立装药物品和标签，避免大口径配方
   通过共用轻装药套利；默认按 TaCZ 火药单位自动分档，9mm 为轻装药、.308 为标准装药、.50 BMG 为重装药。
 - `extraOperations`：在基础步骤与最终压合之间插入额外投入。特殊材料若属于原版批量成本，
