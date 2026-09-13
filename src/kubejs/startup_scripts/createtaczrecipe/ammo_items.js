@@ -4,6 +4,7 @@ StartupEvents.registry("item", (event) => {
     ["rough_9mm_bullet", "kubejs:item/createtaczrecipe_rough_9mm_bullet"],
     ["polished_9mm_bullet", "kubejs:item/createtaczrecipe_polished_9mm_bullet"],
     ["small_arms_primer", "kubejs:item/createtaczrecipe_small_arms_primer"],
+    ["loose_propellant", "kubejs:item/createtaczrecipe_light_propellant_charge"],
     ["light_propellant_charge", "kubejs:item/createtaczrecipe_light_propellant_charge"],
     ["standard_propellant_charge", "kubejs:item/createtaczrecipe_light_propellant_charge"],
     ["heavy_propellant_charge", "kubejs:item/createtaczrecipe_light_propellant_charge"],

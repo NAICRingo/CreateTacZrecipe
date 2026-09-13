@@ -9,21 +9,22 @@
 - `key`：弹药短名，用于生成 `createtaczrecipe:*` 配方 ID。
 - `materials.casing`、`materials.bullet`：物品或标签输入，例如 `{tag: "c:plates/brass"}`。
 - `counts`：`casing` 和 `roughBullet` 的成型产量。
-- `sourceBatch`、`powderCount`：原版枪匠台批量与火药单位。框架将 `powderCount` 作为一批定量装药输入，
-  将 `sourceBatch` 写入装药批量产出和 `economy` 元数据；它不会被误当作每发消耗。
+- `sourceBatch`、`powderCount`：原版枪匠台批量与火药单位，保存于 `economy` 供平衡核对。
+  装药由下述公共链生产，不再为每个口径重复生成相同输出的混合配方。
   当前 Create/CDG 配方结果遵守 Minecraft 单堆上限 99；因此 22 WMR 的原始 100 发批量转换为 96 发合法批次，
   不使用未经确认的多结果堆拆分格式。
 - `chargeLevel`：`light`、`standard` 或 `heavy`。三档使用独立装药物品和标签，避免大口径配方
   通过共用轻装药套利；默认按 TaCZ 火药单位自动分档，9mm 为轻装药、.308 为标准装药、.50 BMG 为重装药。
-- `extraOperations`：在基础步骤与最终压合之间插入额外投入。特殊材料若属于原版批量成本，
-  推荐放入 `propellantExtraIngredients`，在一次混合中按批量消耗并产出整批分级装药，避免每发重复消耗。
+- `bulletExtraIngredients`：口径专用弹头压铸的附加材料，使用 `{item/tag, amount}`；框架把 `amount`
+  展开为重复 ingredient，避免依赖普通物品 ingredient 上无效的 `count`。
+- `extraOperations`：在基础步骤与最终压合之间插入额外序列工序；不用于原版批量材料成本。
 - `moldMaterials.casing`、`moldMaterials.bullet`：制作 CDG 模具的配方输入；不再由生成器写死。
 - `casingMold`、`bulletMold`：CDG 模具类型；模具是 Basin 配方的专用输入，不是普通消耗材料。
 - `casing`、`roughBullet`、`polishedBullet`、`primer`、`propellant`、`transitional`：中间物品。
 - 以上字段可以直接改为已安装模组的物品 ID；框架会直接使用该物品，不生成转换配方。
   如果任一中间物品不存在，整个该口径定义会被跳过，并记录缺失 ID。
 - `polishing`：砂纸配方输入和输出。
-- `primerRecipe`、`propellantRecipe`：底火和装药的完整 Create 配方对象。
+- `primerRecipe`：底火的完整 Create 配方对象。`propellantRecipe` 仅供显式覆盖；默认使用公共装药链。
 - `operations`：序列组装步骤数组。当前仅允许已确认的 `create:deploying`、
   `create:pressing`、`create:cutting`。每步保留定义中的额外字段（例如
   `keep_held_item`），并原样传给 Create。输入和输出可以用 `{ref: "primer"}`、
@@ -39,18 +40,35 @@
 - `createtaczrecipe:casings/empty`
 - `createtaczrecipe:projectiles/rough`
 - `createtaczrecipe:projectiles/polished`
-- `createtaczrecipe:primers/small_arms`
+- `createtaczrecipe:materials/brass_blanks`
+- `createtaczrecipe:materials/copper_blanks`
+- `createtaczrecipe:materials/iron_plates`
+- `createtaczrecipe:materials/primers`
+- `createtaczrecipe:materials/propellants`
+- `createtaczrecipe:propellants/loose`
 - `createtaczrecipe:propellants/light`
+- `createtaczrecipe:propellants/standard`
+- `createtaczrecipe:propellants/heavy`
 - `createtaczrecipe:cartridges/incomplete`
 
-材料输入继续使用 `createtaczrecipe:metal_blanks/<key>/brass` 和 `/copper` 等按口径标签，
-避免 9mm 与其他口径混用；`createtaczrecipe:metal_blanks/brass` 等通用标签仍保留给兼容层。
-中间产物还提供通用用途标签及 `createtaczrecipe:<key>/...` 口径标签。将外部物品加入对应标签即可参与输入，
+原材料使用通用 `materials/*` 标签；中间产物使用
+`casings/empty/<key>`、`projectiles/rough/<key>`、`projectiles/polished/<key>`、
+`cartridges/incomplete/<key>` 口径标签，避免不同口径互相混用。将外部物品加入对应标签即可参与输入，
 而 `casing`、`roughBullet`、`polishedBullet`、`primer`、`propellant`、`transitional` 字段仍可直接替换产物 ID。
+
+## 公共装药链
+
+- 1 份 `materials/propellants` 搅拌为 24 份松散推进药。
+- 1 份松散推进药辊压为 1 份轻型定量装药。
+- 4 份松散推进药压实为 1 份标准定量装药。
+- 5 份标准定量装药加热压实为 1 份重型定量装药。
+
+多件材料使用重复 ingredient 表达，因此材料不足时不会匹配。轻型用于 22 WMR、9mm、.45 ACP、
+4.6x30mm、5.7x28mm、7.62x25mm；重型仅用于 .50 BMG；其余当前口径使用标准装药。
 
 ## 添加常规口径
 
-在 `ammo_standard.js` 的数据表增加 `[key, casingYield, bulletYield, powderCount, sourceBatch]`，
+在 `ammo_standard.js` 的数据表增加 `[key, powderCount, sourceBatch, metalUnits]`，
 再调用 `standardAmmo`。`powderCount` 对应 TaCZ 默认枪匠台配方的火药消耗；`sourceBatch` 仅记录原始批量，
 因为 TaCZ 并未规定 CDG 模具的单次壳体/弹头产量。不要为同一 AmmoId 再注册第二条定义。
 

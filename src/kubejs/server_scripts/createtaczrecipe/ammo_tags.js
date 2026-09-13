@@ -2,9 +2,10 @@ ServerEvents.tags("item", (event) => {
   const keys = global.createtaczrecipe.caliberKeys;
   event.add("createtaczrecipe:materials/brass_blanks", "createdeco:brass_coin");
   event.add("createtaczrecipe:materials/copper_blanks", "createdeco:copper_coin");
-  event.add("createtaczrecipe:materials/iron_plates", "createdeco:iron_coin");
+  event.add("createtaczrecipe:materials/iron_plates", "#c:plates/iron");
   event.add("createtaczrecipe:materials/primers", "createtaczrecipe:small_arms_primer");
   event.add("createtaczrecipe:materials/propellants", "minecraft:gunpowder");
+  event.add("createtaczrecipe:propellants/loose", "createtaczrecipe:loose_propellant");
   event.add("createtaczrecipe:propellants/light", "createtaczrecipe:light_propellant_charge");
   event.add("createtaczrecipe:propellants/standard", "createtaczrecipe:standard_propellant_charge");
   event.add("createtaczrecipe:propellants/heavy", "createtaczrecipe:heavy_propellant_charge");
