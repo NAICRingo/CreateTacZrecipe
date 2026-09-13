@@ -13,6 +13,11 @@
   装药由下述公共链生产，不再为每个口径重复生成相同输出的混合配方。
   当前 Create/CDG 配方结果遵守 Minecraft 单堆上限 99；因此 22 WMR 的原始 100 发批量转换为 96 发合法批次，
   不使用未经确认的多结果堆拆分格式。
+- `casingMetalUnits`、`bulletMetalUnits`：分别覆盖弹壳和弹头压铸所需的重复材料输入数。
+  未填写时由 `metalUnits` 近似均分。CDG 1.3.15 的一条 `compression_molding` 配方最多接受
+  64 个物品输入；附加弹头材料也计入这个上限。框架会在注册该口径的任何配方前检查两条压铸配方，
+  超限时记录口径、配方 ID 和实际输入数，并只跳过该口径。.50 BMG 明确使用 60 份黄铜坯制作弹壳，
+  50 份铜坯加 12 个青金石和 1 根烈焰棒制作弹头，输入数分别为 60 和 63。
 - `chargeLevel`：`light`、`standard` 或 `heavy`。三档使用独立装药物品和标签，避免大口径配方
   通过共用轻装药套利；默认按 TaCZ 火药单位自动分档，9mm 为轻装药、.308 为标准装药、.50 BMG 为重装药。
 - `bulletExtraIngredients`：口径专用弹头压铸的附加材料，使用 `{item/tag, amount}`；框架把 `amount`
@@ -24,7 +29,10 @@
 - 以上字段可以直接改为已安装模组的物品 ID；框架会直接使用该物品，不生成转换配方。
   如果任一中间物品不存在，整个该口径定义会被跳过，并记录缺失 ID。
 - `polishing`：砂纸配方输入和输出。
-- `primerRecipe`：底火的完整 Create 配方对象。`propellantRecipe` 仅供显式覆盖；默认使用公共装药链。
+- `primerRecipe`：可选的口径专用底火配方。默认不生成口径专用配方，而只使用公共的
+  `createtaczrecipe:components/small_arms_primer`（1 份铁板压制为 10 个小型枪械底火）。
+  只有定义显式提供 `primerRecipe` 时才会额外生成 `<key>_primer`。`propellantRecipe` 同样仅供显式覆盖；
+  默认使用公共装药链。
 - `operations`：序列组装步骤数组。当前仅允许已确认的 `create:deploying`、
   `create:pressing`、`create:cutting`。每步保留定义中的额外字段（例如
   `keep_held_item`），并原样传给 Create。输入和输出可以用 `{ref: "primer"}`、
@@ -71,6 +79,12 @@
 在 `ammo_standard.js` 的数据表增加 `[key, powderCount, sourceBatch, metalUnits]`，
 再调用 `standardAmmo`。`powderCount` 对应 TaCZ 默认枪匠台配方的火药消耗；`sourceBatch` 仅记录原始批量，
 因为 TaCZ 并未规定 CDG 模具的单次壳体/弹头产量。不要为同一 AmmoId 再注册第二条定义。
+
+符合现有命名规则的新口径物品（至少注册 `createtaczrecipe:empty_<key>_casing`）会由原生创造栏
+动态发现；随后按稳定的 key 排序加入该口径的弹壳模具、弹头模具、弹壳、粗制弹头、抛光弹头和
+未完成弹药。模具类型必须保持 `kubejs:createtaczrecipe_<key>_casing` / `_bullet`。框架会把这些模具
+从 Create Diesel Generators 自己的创造栏父级内容中移除，但不会删除物品、配方、JEI 条目或创造搜索，
+它们仍显示在“机械动力 × TaCZ 配方”专属创造栏中。这样新增口径无需再维护一份 Java 口径数组。
 
 未来特殊弹药可在 `primerRecipe`、`propellantRecipe` 或独立组件配方中使用已确认的
 `create:mixing`、`create:cutting`、`create:sandpaper_polishing` 等类型；序列工序列表目前只允许

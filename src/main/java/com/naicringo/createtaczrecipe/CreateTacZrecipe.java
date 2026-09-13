@@ -2,6 +2,10 @@ package com.naicringo.createtaczrecipe;
 
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
 import com.mojang.logging.LogUtils;
 
 import net.minecraft.core.component.DataComponentType;
@@ -15,6 +19,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -22,11 +27,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public final class CreateTacZrecipe {
     public static final String MOD_ID = "createtaczrecipe";
     private static final Logger LOGGER = LogUtils.getLogger();
-    private static final String[] CALIBERS = {
-        "22wmr", "9mm", "45acp", "46x30", "57x28", "762x25", "357mag", "500mag", "50ae",
-        "545x39", "556x45", "58x42", "68x51fury", "762x39", "30_06", "308", "338", "45_70",
-        "762x54", "792x57", "50bmg"
-    };
+    private static final ResourceLocation DIESEL_GENERATORS_TAB =
+        ResourceLocation.fromNamespaceAndPath("createdieselgenerators", "cdg_creative_tab");
+    private static final ResourceLocation MOLD_ITEM =
+        ResourceLocation.fromNamespaceAndPath("createdieselgenerators", "mold");
+    private static final ResourceLocation MOLD_TYPE_COMPONENT =
+        ResourceLocation.fromNamespaceAndPath("createdieselgenerators", "mold_type");
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TABS =
         DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     public static final DeferredHolder<CreativeModeTab, CreativeModeTab> MAIN_TAB = CREATIVE_TABS.register("main", () ->
@@ -38,6 +44,7 @@ public final class CreateTacZrecipe {
 
     public CreateTacZrecipe(IEventBus modEventBus) {
         CREATIVE_TABS.register(modEventBus);
+        modEventBus.addListener(CreateTacZrecipe::filterDieselGeneratorsTab);
         LOGGER.info("CreateTacZrecipe native module loaded");
     }
 
@@ -47,11 +54,12 @@ public final class CreateTacZrecipe {
         addItem(output, "createtaczrecipe:light_propellant_charge");
         addItem(output, "createtaczrecipe:standard_propellant_charge");
         addItem(output, "createtaczrecipe:heavy_propellant_charge");
-        for (String caliber : CALIBERS) {
+        List<String> calibers = discoverCalibers();
+        for (String caliber : calibers) {
             addMold(output, "createtaczrecipe_" + caliber + "_casing");
             addMold(output, "createtaczrecipe_" + caliber + "_bullet");
         }
-        for (String caliber : CALIBERS) {
+        for (String caliber : calibers) {
             addItem(output, "createtaczrecipe:empty_" + caliber + "_casing");
             addItem(output, "createtaczrecipe:rough_" + caliber + "_bullet");
             addItem(output, "createtaczrecipe:polished_" + caliber + "_bullet");
@@ -61,25 +69,69 @@ public final class CreateTacZrecipe {
 
     private static ItemStack itemStack(String id) {
         Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(id));
-        return item == Items.AIR ? new ItemStack(Items.GUNPOWDER) : new ItemStack(item);
+        return item == Items.AIR ? ItemStack.EMPTY : new ItemStack(item);
     }
 
     private static void addItem(CreativeModeTab.Output output, String id) {
         ItemStack stack = itemStack(id);
-        if (!stack.is(Items.GUNPOWDER) || id.equals("minecraft:gunpowder")) {
+        if (!stack.isEmpty()) {
             output.accept(stack);
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
+    private static List<String> discoverCalibers() {
+        List<String> calibers = new ArrayList<>();
+        for (ResourceLocation id : BuiltInRegistries.ITEM.keySet()) {
+            String path = id.getPath();
+            if (!id.getNamespace().equals(MOD_ID) || !path.startsWith("empty_") || !path.endsWith("_casing")) {
+                continue;
+            }
+            String caliber = path.substring("empty_".length(), path.length() - "_casing".length());
+            if (!caliber.isEmpty()) {
+                calibers.add(caliber);
+            }
+        }
+        calibers.sort(Comparator.naturalOrder());
+        return calibers;
+    }
+
     private static void addMold(CreativeModeTab.Output output, String moldType) {
-        Item mold = BuiltInRegistries.ITEM.get(ResourceLocation.parse("createdieselgenerators:mold"));
-        DataComponentType component = BuiltInRegistries.DATA_COMPONENT_TYPE.get(ResourceLocation.parse("createdieselgenerators:mold_type"));
+        Item mold = BuiltInRegistries.ITEM.get(MOLD_ITEM);
+        DataComponentType<ResourceLocation> component = moldTypeComponent();
         if (mold == Items.AIR || component == null) {
             return;
         }
         ItemStack stack = new ItemStack(mold);
         stack.set(component, ResourceLocation.parse("kubejs:" + moldType));
         output.accept(stack);
+    }
+
+    private static void filterDieselGeneratorsTab(BuildCreativeModeTabContentsEvent event) {
+        if (!event.getTabKey().location().equals(DIESEL_GENERATORS_TAB)) {
+            return;
+        }
+        DataComponentType<ResourceLocation> component = moldTypeComponent();
+        Item mold = BuiltInRegistries.ITEM.get(MOLD_ITEM);
+        if (mold == Items.AIR || component == null) {
+            return;
+        }
+        List<ItemStack> entries = List.copyOf(event.getParentEntries());
+        for (ItemStack stack : entries) {
+            if (!stack.is(mold)) {
+                continue;
+            }
+            ResourceLocation moldType = stack.get(component);
+            if (moldType != null
+                && moldType.getNamespace().equals("kubejs")
+                && moldType.getPath().startsWith("createtaczrecipe_")) {
+                event.remove(stack, CreativeModeTab.TabVisibility.PARENT_TAB_ONLY);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static DataComponentType<ResourceLocation> moldTypeComponent() {
+        return (DataComponentType<ResourceLocation>) (DataComponentType<?>)
+            BuiltInRegistries.DATA_COMPONENT_TYPE.get(MOLD_TYPE_COMPONENT);
     }
 }

@@ -41,11 +41,13 @@ recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recip
 
 const definitions = context.global.createtaczrecipe.definitions;
 check(definitions.length === 21, `expected 21 definitions, got ${definitions.length}`);
+check(recipes.length === 131, `expected 131 recipes, got ${recipes.length}`);
 check(new Set(definitions.map((definition) => definition.ammoId)).size === 21, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
 for (const definition of definitions) {
   const key = definition.key;
+  check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === 6, `${key} must register exactly six caliber-specific recipes`);
   for (const tag of [`createtaczrecipe:casings/empty/${key}`, `createtaczrecipe:projectiles/rough/${key}`, `createtaczrecipe:projectiles/polished/${key}`, `createtaczrecipe:cartridges/incomplete/${key}`]) {
     const values = tags.get(tag) || [];
     check(values.length === 1, `${tag} must contain exactly one default item`);
@@ -61,11 +63,14 @@ const common = {
   light: recipes.find((entry) => entry.id === "createtaczrecipe:components/light_propellant").recipe,
   standard: recipes.find((entry) => entry.id === "createtaczrecipe:components/standard_propellant").recipe,
   heavy: recipes.find((entry) => entry.id === "createtaczrecipe:components/heavy_propellant").recipe,
+  primer: recipes.find((entry) => entry.id === "createtaczrecipe:components/small_arms_primer").recipe,
 };
 check(common.loose.type === "create:mixing" && common.loose.ingredients.length === 1 && common.loose.results[0].count === 24, "loose propellant recipe mismatch");
 check(common.light.type === "create:pressing" && common.light.ingredients.length === 1, "light charge recipe mismatch");
 check(common.standard.type === "create:compacting" && common.standard.ingredients.length === 4, "standard charge must require four repeated ingredients");
 check(common.heavy.type === "create:compacting" && common.heavy.ingredients.length === 5 && common.heavy.heat_requirement === "heated", "heavy charge must require five repeated ingredients and heat");
+check(common.primer.type === "create:pressing" && common.primer.ingredients.length === 1 && common.primer.results[0].count === 10, "shared primer recipe mismatch");
+check(recipes.filter((entry) => entry.id.endsWith("_primer")).length === 1, "default primer recipe must be registered exactly once");
 check(recipes.filter((entry) => entry.recipe.type === "create:mixing").length === 1, "basin mixing must only produce loose propellant");
 const commonPropellantIds = new Set([
   "createtaczrecipe:components/loose_propellant", "createtaczrecipe:components/light_propellant",
@@ -76,6 +81,9 @@ check(!recipes.some((entry) => /_propellant$/.test(entry.id) && !commonPropellan
 for (const entry of recipes) {
   for (const result of entry.recipe.results || []) check(!result.count || result.count <= 99, `${entry.id} output exceeds 99`);
   for (const ingredient of entry.recipe.ingredients || []) check(ingredient.count === undefined, `${entry.id} uses unsupported ingredient count`);
+  if (entry.recipe.type === "createdieselgenerators:compression_molding") {
+    check(entry.recipe.ingredients.length <= 64, `${entry.id} has ${entry.recipe.ingredients.length} compression molding inputs; maximum is 64`);
+  }
 }
 
 const grades = { "9mm": "light", "308": "standard", "50bmg": "heavy" };
@@ -94,8 +102,11 @@ check(definitions.find((value) => value.key === "50bmg").economy.chargeCapacity 
 
 const bullet308 = recipes.find((entry) => entry.id === "createtaczrecipe:components/308_rough_bullet").recipe;
 const bullet50 = recipes.find((entry) => entry.id === "createtaczrecipe:components/50bmg_rough_bullet").recipe;
+const casing50 = recipes.find((entry) => entry.id === "createtaczrecipe:components/50bmg_casing").recipe;
 check(bullet308.ingredients.filter((ingredient) => ingredient.item === "minecraft:lapis_lazuli").length === 1, ".308 lapis must be in bullet molding");
 check(bullet50.ingredients.filter((ingredient) => ingredient.item === "minecraft:lapis_lazuli").length === 12, ".50 BMG lapis must be in bullet molding");
 check(bullet50.ingredients.filter((ingredient) => ingredient.item === "minecraft:blaze_rod").length === 1, ".50 BMG blaze rod must be in bullet molding");
+check(casing50.ingredients.length === 60, `.50 BMG casing molding must have 60 inputs, got ${casing50.ingredients.length}`);
+check(bullet50.ingredients.length === 63, `.50 BMG bullet molding must have 63 inputs, got ${bullet50.ingredients.length}`);
 
 console.log(`CreateTacZrecipe static validation passed: ${definitions.length} definitions, ${recipes.length} recipes, ${tags.size} item tags.`);

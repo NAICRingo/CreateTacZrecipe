@@ -3,6 +3,7 @@
   // These are the Create operation types supported inside sequenced assembly here.
   const allowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true };
   const componentAllowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true, "create:mixing": true, "create:compacting": true, "create:sandpaper_polishing": true, "createdieselgenerators:compression_molding": true };
+  const compressionMoldingInputLimit = 64;
   let seen = {};
   const log = (message) => console.log(`[CreateTacZrecipe] ${message}`);
   const hasText = (value) => typeof value === "string" && value.length > 0;
@@ -58,6 +59,22 @@
     if (recipe.results && (!Array.isArray(recipe.results) || recipe.results.some((item) => !validResult(item) || !validCount(item.count)))) { log(`skipped ${key}: invalid ${name} results/count`); return false; }
     return true;
   };
+  const validateCompressionMoldingInputs = (ammo) => {
+    const casingCount = ammo.economy.casingMetalUnits;
+    const bulletCount = ammo.economy.bulletMetalUnits + ammo.materials.bulletExtras.reduce((total, ingredient) => total + ingredient.amount, 0);
+    const recipes = [
+      { id: `createtaczrecipe:components/${ammo.key}_casing`, count: casingCount },
+      { id: `createtaczrecipe:components/${ammo.key}_rough_bullet`, count: bulletCount },
+    ];
+    let valid = true;
+    recipes.forEach((recipe) => {
+      if (recipe.count > compressionMoldingInputLimit) {
+        log(`skipped ${ammo.key}: compression molding recipe ${recipe.id} has ${recipe.count} item inputs; maximum is ${compressionMoldingInputLimit}`);
+        valid = false;
+      }
+    });
+    return valid;
+  };
   const validate = (ammo) => {
     if (!ammo || typeof ammo !== "object") {
       log("skipped definition: expected an object");
@@ -73,6 +90,7 @@
     if (!Array.isArray(ammo.materials.bulletExtras) || ammo.materials.bulletExtras.some((ingredient) => !validIngredient(ingredient) || !Number.isInteger(ingredient.amount) || ingredient.amount < 1 || ingredient.amount > 99)) { log(`skipped ${ammo.key}: invalid bulletExtraIngredients`); return false; }
     if (!ammo.counts || !validCount(ammo.counts.casing) || !validCount(ammo.counts.roughBullet) || !ammo.economy || !validCount(ammo.economy.sourceBatch)) { log(`skipped ${ammo.key}: result counts must be integers in range 1..99`); return false; }
     if (["light", "standard", "heavy"].indexOf(ammo.chargeLevel) < 0) { log(`skipped ${ammo.key}: invalid chargeLevel ${ammo.chargeLevel}`); return false; }
+    if (!validateCompressionMoldingInputs(ammo)) return false;
     if (!validateComponent(ammo.polishing, "polishing", ammo.key) || !validateComponent(ammo.primerRecipe, "primer", ammo.key) || !validateComponent(ammo.propellantRecipe, "propellant", ammo.key)) return false;
     for (let i = 0; i < ammo.operations.length; i++) if (!validateStep(ammo.operations[i], i, ammo.key)) return false;
     return true;
@@ -84,7 +102,8 @@
     if (emit(event, "components/light_propellant", { type: "create:pressing", ingredients: [{ tag: "createtaczrecipe:propellants/loose" }], results: [{ id: "createtaczrecipe:light_propellant_charge" }] })) commonRegistered++;
     if (emit(event, "components/standard_propellant", { type: "create:compacting", ingredients: repeatIngredient({ tag: "createtaczrecipe:propellants/loose" }, 4), results: [{ id: "createtaczrecipe:standard_propellant_charge" }] })) commonRegistered++;
     if (emit(event, "components/heavy_propellant", { type: "create:compacting", heat_requirement: "heated", ingredients: repeatIngredient({ tag: "createtaczrecipe:propellants/standard" }, 5), results: [{ id: "createtaczrecipe:heavy_propellant_charge" }] })) commonRegistered++;
-    log(`registered ${commonRegistered} common propellant recipes`);
+    if (emit(event, "components/small_arms_primer", { type: "create:pressing", ingredients: [{ tag: "createtaczrecipe:materials/iron_plates" }], results: [{ id: "createtaczrecipe:small_arms_primer", count: 10 }] })) commonRegistered++;
+    log(`registered ${commonRegistered} common component recipes`);
     global.createtaczrecipe.definitions.forEach((ammo) => {
       if (!validate(ammo)) return;
       const base = `ammo/${ammo.key}`;

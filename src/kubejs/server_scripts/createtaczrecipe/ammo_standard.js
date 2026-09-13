@@ -23,5 +23,7 @@ standardCalibers.forEach((row) => {
     sourceBatch: sourceBatch,
     bulletExtraIngredients: bulletExtraIngredients,
     chargeLevel: chargeLevel,
+    casingMetalUnits: key === "50bmg" ? 60 : undefined,
+    bulletMetalUnits: key === "50bmg" ? 50 : undefined,
   }));
 });

@@ -61,11 +61,8 @@ const standardAmmo = (spec) => {
     final: spec.final || "tacz:ammo",
     ammoId: spec.ammoId || `tacz:${key}`,
     polishing: spec.polishing || { type: "create:sandpaper_polishing", input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
-    primerRecipe: spec.primerRecipe || {
-      type: "create:pressing",
-      ingredients: [{ tag: "createtaczrecipe:materials/iron_plates" }],
-      results: [{ ref: "primer", count: 10 }],
-    },
+    // Primers use the shared recipe unless a caliber explicitly opts into an override.
+    primerRecipe: spec.primerRecipe || null,
     propellantRecipe: spec.propellantRecipe || null,
     operations: spec.operations || [
       { type: "create:deploying", ingredients: [{ ref: "transitional" }, primerInput], results: [{ ref: "transitional" }] },
