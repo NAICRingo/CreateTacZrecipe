@@ -9,6 +9,7 @@ $modsPath = Join-Path $resolvedInstance "mods"
 $targetPath = Join-Path $resolvedInstance "kubejs"
 $sourcePath = Join-Path (Split-Path -Parent $PSScriptRoot) "src\kubejs"
 $exampleSource = Join-Path (Split-Path -Parent $PSScriptRoot) "config\createtaczrecipe\ammo_overrides.json.example"
+$additionExampleSource = Join-Path (Split-Path -Parent $PSScriptRoot) "config\createtaczrecipe\ammo_addition_test.json.example"
 $configPath = Join-Path $resolvedInstance "config\createtaczrecipe"
 
 if (-not (Test-Path -LiteralPath $modsPath -PathType Container)) {
@@ -43,6 +44,11 @@ $exampleDestination = Join-Path $configPath "ammo_overrides.json.example"
 if (-not (Test-Path -LiteralPath $exampleDestination)) {
     Copy-Item -LiteralPath $exampleSource -Destination $exampleDestination
     Write-Host "Deployed config example ammo_overrides.json.example"
+}
+$additionExampleDestination = Join-Path $configPath "ammo_addition_test.json.example"
+if (-not (Test-Path -LiteralPath $additionExampleDestination)) {
+    Copy-Item -LiteralPath $additionExampleSource -Destination $additionExampleDestination
+    Write-Host "Deployed config example ammo_addition_test.json.example"
 }
 
 Write-Host "CreateTacZrecipe KubeJS module deployed to $resolvedInstance"

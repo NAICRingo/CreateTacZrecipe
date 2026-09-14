@@ -19,4 +19,10 @@ ServerEvents.tags("item", (event) => {
     event.add(`createtaczrecipe:projectiles/polished/${key}`, `createtaczrecipe:polished_${key}_bullet`);
     event.add(`createtaczrecipe:cartridges/incomplete/${key}`, `createtaczrecipe:incomplete_${key}_round`);
   });
+  (global.createtaczrecipe.externalAmmo || []).forEach((ammo) => {
+    event.add(`createtaczrecipe:casings/empty/${ammo.key}`, ammo.casing);
+    event.add(`createtaczrecipe:projectiles/rough/${ammo.key}`, ammo.roughBullet);
+    event.add(`createtaczrecipe:projectiles/polished/${ammo.key}`, ammo.polishedBullet);
+    event.add(`createtaczrecipe:cartridges/incomplete/${ammo.key}`, ammo.transitional);
+  });
 });

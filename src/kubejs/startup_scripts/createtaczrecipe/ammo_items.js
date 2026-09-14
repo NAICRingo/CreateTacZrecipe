@@ -18,6 +18,16 @@ StartupEvents.registry("item", (event) => {
     items.push([`incomplete_${key}_round`, "kubejs:item/createtaczrecipe_incomplete_9mm_round"]);
   });
 
+  // External definitions may choose project-namespace item IDs. Register only
+  // those IDs; IDs owned by another mod are intentionally left untouched.
+  (global.createtaczrecipe.externalAmmo || []).forEach((ammo) => {
+    [ammo.casing, ammo.roughBullet, ammo.polishedBullet, ammo.transitional].forEach((id) => {
+      if (id.indexOf("createtaczrecipe:") === 0 && !items.some((entry) => `createtaczrecipe:${entry[0]}` === id)) {
+        items.push([id.substring("createtaczrecipe:".length), "kubejs:item/createtaczrecipe_empty_9mm_casing"]);
+      }
+    });
+  });
+
   items.forEach(([id, texture]) => {
     event.create(`createtaczrecipe:${id}`).texture(texture).maxStackSize(64);
   });

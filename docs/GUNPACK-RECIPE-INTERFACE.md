@@ -7,7 +7,8 @@
 ## 用户 JSON 覆盖
 
 把固定文件 `ammo_overrides.json` 放入实例的 `config/createtaczrecipe`，重启游戏后会通过 KubeJS
-安全接口 `JsonIO.read(...)` 读取。文件中的每一项覆盖一个已有口径，未写字段继续使用默认值。
+安全接口 `JsonIO.read(...)` 读取。文件中的 `overrides` 每一项覆盖一个已有口径，未写字段继续使用默认值；
+`additions` 可声明全新口径。
 可复制仓库中的 `config/createtaczrecipe/ammo_overrides.json.example` 并去掉 `.example` 后缀：
 
 ```json
@@ -27,9 +28,11 @@
 `{ "tag": "namespace:path" }`。`counts` 可分别设置 `casing`、`roughBullet`、`polishedBullet`、
 `assembly`，例如 `{ "counts": { "casing": 40 } }` 只改变弹壳产量。
 
-每条覆盖独立校验。未知口径、未知字段、错误类型或越界数量只跳过该条，日志记录数组下标、口径、
+每条覆盖或新增定义独立校验。未知口径、未知字段、错误类型或越界数量只跳过该条，日志记录数组下标、口径、
 字段和原因。文件不存在、JSON 损坏、读取失败或根结构错误时，加载器会明确记录日志并使用全部默认
-口径。配置只覆盖配方数据，本阶段不通过 JSON 注册新物品或新口径，也不允许任意工序编排。
+口径。新增定义在 startup 阶段读取，只有 `createtaczrecipe:` 物品 ID 会由本项目注册；其他命名空间的
+中间物品必须已由对应模组注册。新增定义需要 `key`、`ammoId`、`outputItem`、`molds`、`materials`、
+`chargeLevel` 和 `counts`，可复制 `config/createtaczrecipe/ammo_addition_test.json.example`。
 
 ## 定义字段
 

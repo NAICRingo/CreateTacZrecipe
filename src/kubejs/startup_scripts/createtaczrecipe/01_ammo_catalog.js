@@ -44,4 +44,62 @@
   global.createtaczrecipe.ammoCatalog = catalog;
   global.createtaczrecipe.caliberKeys = catalog.map((entry) => entry.key);
   global.createtaczrecipe.caliberDisplayNames = names;
+
+  // Startup-time additions are read before item, mold and tag registration. This is
+  // deliberately a single JsonIO document so external gun packs need no Java code.
+  var ctzAdditionPath = "config/createtaczrecipe/ammo_overrides.json";
+  var ctzAdditionIdPattern = /^[a-z0-9_.-]+:[a-z0-9_./-]+$/;
+  var ctzAdditions = [];
+  try {
+    var ctzAdditionDocument = typeof JsonIO !== "undefined" ? JsonIO.read(ctzAdditionPath) : null;
+    var ctzEntries = ctzAdditionDocument && Array.isArray(ctzAdditionDocument.additions) ? ctzAdditionDocument.additions : [];
+    for (var ctzIndex = 0; ctzIndex < ctzEntries.length; ctzIndex++) {
+      var ctzEntry = ctzEntries[ctzIndex];
+      var ctzKey = ctzEntry && ctzEntry.key;
+      var ctzOutput = ctzEntry && ctzEntry.outputItem;
+      var ctzRequired = ctzOutput && [ctzOutput.casing, ctzOutput.roughBullet, ctzOutput.polishedBullet, ctzOutput.transitional];
+      if (typeof ctzKey !== "string" || !/^[a-z0-9_]+$/.test(ctzKey) || global.createtaczrecipe.caliberKeys.indexOf(ctzKey) >= 0) {
+        console.log(`[CreateTacZrecipe] skipped config addition ${ctzAdditionPath}#additions[${ctzIndex}]: invalid or duplicate key ${ctzKey}`);
+        continue;
+      }
+      if (!ctzRequired || ctzRequired.some((id) => typeof id !== "string" || !ctzAdditionIdPattern.test(id))) {
+        console.log(`[CreateTacZrecipe] skipped config addition ${ctzAdditionPath}#additions[${ctzIndex}] for ${ctzKey}: outputItem fields are required resource IDs`);
+        continue;
+      }
+      var ctzMold = ctzEntry.molds || {};
+      if (typeof ctzMold.casing !== "string" || typeof ctzMold.bullet !== "string") {
+        console.log(`[CreateTacZrecipe] skipped config addition ${ctzAdditionPath}#additions[${ctzIndex}] for ${ctzKey}: molds.casing and molds.bullet are required`);
+        continue;
+      }
+      var ctzSpec = {
+        key: ctzKey, ammoId: ctzEntry.ammoId || `tacz:${ctzKey}`, displayName: ctzEntry.displayName || ctzKey,
+        casing: ctzOutput.casing, roughBullet: ctzOutput.roughBullet, polishedBullet: ctzOutput.polishedBullet, transitional: ctzOutput.transitional,
+        casingMold: ctzMold.casing, bulletMold: ctzMold.bullet,
+        casingMaterial: ctzEntry.materials && ctzEntry.materials.casing, bulletMaterial: ctzEntry.materials && ctzEntry.materials.bullet,
+        casingMetalUnits: ctzEntry.materials && ctzEntry.materials.casingUnits, bulletMetalUnits: ctzEntry.materials && ctzEntry.materials.bulletUnits,
+        chargeLevel: ctzEntry.chargeLevel, counts: ctzEntry.counts, bulletExtraIngredients: ctzEntry.bulletExtraIngredients,
+        sourceBatch: ctzEntry.sourceBatch || (ctzEntry.counts && ctzEntry.counts.casing) || 1,
+      };
+      if (!ctzSpec.casingMaterial || !ctzSpec.bulletMaterial || !Number.isInteger(ctzSpec.casingMetalUnits) || !Number.isInteger(ctzSpec.bulletMetalUnits)) {
+        console.log(`[CreateTacZrecipe] skipped config addition ${ctzAdditionPath}#additions[${ctzIndex}] for ${ctzKey}: required materials and units are missing`);
+        continue;
+      }
+      if (!ctzAdditionIdPattern.test(ctzSpec.ammoId) || !ctzEntry.chargeLevel || !ctzSpec.counts) {
+        console.log(`[CreateTacZrecipe] skipped config addition ${ctzAdditionPath}#additions[${ctzIndex}] for ${ctzKey}: ammoId, chargeLevel and counts are required`);
+        continue;
+      }
+      var ctzDefinition = global.createtaczrecipe.standardAmmo(ctzSpec);
+      ctzDefinition.displayName = ctzSpec.displayName;
+      ctzDefinition.dynamic = true;
+      ctzAdditions.push(ctzDefinition);
+      catalog.push(ctzDefinition);
+      names[ctzKey] = ctzSpec.displayName;
+      global.createtaczrecipe.caliberKeys.push(ctzKey);
+      global.createtaczrecipe.caliberDisplayNames[ctzKey] = ctzSpec.displayName;
+      console.log(`[CreateTacZrecipe] received external ammo definition: ${ctzKey}`);
+    }
+  } catch (error) {
+    console.log(`[CreateTacZrecipe] unable to read external additions from ${ctzAdditionPath}; defaults remain active: ${error}`);
+  }
+  global.createtaczrecipe.externalAmmo = ctzAdditions;
 })();
