@@ -30,6 +30,7 @@ function check(condition, message) {
 
 load("src/kubejs/startup_scripts/createtaczrecipe/00_ammo_api.js");
 load("src/kubejs/startup_scripts/createtaczrecipe/01_ammo_catalog.js");
+load("src/kubejs/startup_scripts/createtaczrecipe/02_gunpack_catalog.js");
 load("src/kubejs/server_scripts/createtaczrecipe/ammo_9mm.js");
 load("src/kubejs/server_scripts/createtaczrecipe/ammo_standard.js");
 load("src/kubejs/server_scripts/createtaczrecipe/ammo_definitions.js");
@@ -43,9 +44,9 @@ tagCallback({ add: (tag, value) => {
 recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recipe: recipe }) }) });
 
 const definitions = context.global.createtaczrecipe.definitions;
-check(definitions.length === 22, `expected 22 definitions, got ${definitions.length}`);
-check(recipes.length === 137, `expected 137 recipes, got ${recipes.length}`);
-check(new Set(definitions.map((definition) => definition.ammoId)).size === 22, "duplicate AmmoId");
+check(definitions.length === 30, `expected 30 definitions (22 core + 8 gunpack), got ${definitions.length}`);
+check(recipes.length === 185, `expected 185 recipes (30 x 6 + 5 common), got ${recipes.length}`);
+check(new Set(definitions.map((definition) => definition.ammoId)).size === 30, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
 for (const definition of definitions) {
@@ -96,6 +97,7 @@ for (const key in grades) {
 }
 const lightKeys = new Set(["22wmr", "9mm", "45acp", "46x30", "57x28", "762x25"]);
 for (const definition of definitions) {
+  if (definition.gunpack) continue;
   const expected = definition.key === "50bmg" ? "heavy" : (lightKeys.has(definition.key) ? "light" : "standard");
   check(definition.chargeLevel === expected, `${definition.key} expected ${expected}, got ${definition.chargeLevel}`);
 }
@@ -122,5 +124,11 @@ const bullet12g = recipes.find((entry) => entry.id === "createtaczrecipe:compone
 check(casing12g.ingredients.length === 9 && casing12g.results[0].count === 18, "12G casing balance mismatch");
 check(bullet12g.ingredients.length === 24 && bullet12g.results[0].count === 18, "12G projectile balance mismatch");
 check(bullet12g.ingredients.filter((ingredient) => ingredient.tag === "c:nuggets/iron").length === 18, "12G iron input mismatch");
+
+for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_58x21", "cib_65x50", "cib_8x22", "cib_9x39mm"]) {
+  const definition = definitions.find((value) => value.key === key);
+  check(definition && definition.dynamic && definition.gunpack, `${key} gunpack definition missing`);
+  check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === 6, `${key} must register six gunpack recipes`);
+}
 
 console.log(`CreateTacZrecipe static validation passed: ${definitions.length} definitions, ${recipes.length} recipes, ${tags.size} item tags.`);
