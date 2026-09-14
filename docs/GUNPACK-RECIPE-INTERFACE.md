@@ -115,6 +115,17 @@
 
 ## 添加常规口径
 
+### 已扫描枪包与独立目录
+
+测试实例中已扫描到 `hamster`（Gunpowder Revolution）、`cib`（CIBR Guns Pack）、
+`sfms`（MS-Mobius）和 `create_armorer`（Create Armorer）。可稳定按常规金属弹处理的
+枪包定义位于独立启动脚本 `startup_scripts/createtaczrecipe/02_gunpack_catalog.js`，
+不会改变核心 22 种口径。当前已接入 `hamster:compact_ammo`、`hamster:medium_ammo`、
+`hamster:long_ammo`、`cib:32acp`、`cib:58x21`、`cib:65x50`、`cib:8x22` 和
+`cib:9x39mm`；爆炸、燃烧、火箭、能量及特殊弹头变体暂不注册。由于 KubeJS 安全脚本
+不能可靠枚举压缩枪包文件，定义按已确认的测试包目录维护；可用
+`config/createtaczrecipe/gunpack_overrides.json` 的 `disabled` 数组停用单个 key。
+
 默认口径维护入口是 `startup_scripts/createtaczrecipe/01_ammo_catalog.js`，不再修改
 `ammo_standard.js`。新增默认口径需要同时准备固定物品、语言和模具资源；外部 JSON 的 `additions`
 可新增 key，并可选择项目命名空间的动态中间物品或引用已安装模组物品。`powderCount`、`sourceBatch` 和 `metalUnits` 是来源经济的记录值；
