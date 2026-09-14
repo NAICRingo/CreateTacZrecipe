@@ -88,7 +88,7 @@
     if (absent.length) { log(`skipped ${ammo.key}: output item(s) not found: ${absent.join(", ")}`); return false; }
     if (!ammo.moldMaterials || !Array.isArray(ammo.moldMaterials.casing) || !Array.isArray(ammo.moldMaterials.bullet)) { log(`skipped ${ammo.key}: moldMaterials.casing and moldMaterials.bullet are required arrays`); return false; }
     if (!Array.isArray(ammo.materials.bulletExtras) || ammo.materials.bulletExtras.some((ingredient) => !validIngredient(ingredient) || !Number.isInteger(ingredient.amount) || ingredient.amount < 1 || ingredient.amount > 99)) { log(`skipped ${ammo.key}: invalid bulletExtraIngredients`); return false; }
-    if (!ammo.counts || !validCount(ammo.counts.casing) || !validCount(ammo.counts.roughBullet) || !ammo.economy || !validCount(ammo.economy.sourceBatch)) { log(`skipped ${ammo.key}: result counts must be integers in range 1..99`); return false; }
+    if (!ammo.counts || !validCount(ammo.counts.casing) || !validCount(ammo.counts.roughBullet) || !validCount(ammo.counts.polishedBullet) || !validCount(ammo.counts.assembly) || !ammo.economy || !validCount(ammo.economy.sourceBatch)) { log(`skipped ${ammo.key}: result counts must be integers in range 1..99`); return false; }
     if (["light", "standard", "heavy"].indexOf(ammo.chargeLevel) < 0) { log(`skipped ${ammo.key}: invalid chargeLevel ${ammo.chargeLevel}`); return false; }
     if (!validateCompressionMoldingInputs(ammo)) return false;
     if (!validateComponent(ammo.polishing, "polishing", ammo.key) || !validateComponent(ammo.primerRecipe, "primer", ammo.key) || !validateComponent(ammo.propellantRecipe, "propellant", ammo.key)) return false;

@@ -8,6 +8,8 @@ $resolvedInstance = (Resolve-Path -LiteralPath $InstancePath).Path
 $modsPath = Join-Path $resolvedInstance "mods"
 $targetPath = Join-Path $resolvedInstance "kubejs"
 $sourcePath = Join-Path (Split-Path -Parent $PSScriptRoot) "src\kubejs"
+$exampleSource = Join-Path (Split-Path -Parent $PSScriptRoot) "config\createtaczrecipe\9mm-override.json.example"
+$configPath = Join-Path $resolvedInstance "config\createtaczrecipe"
 
 if (-not (Test-Path -LiteralPath $modsPath -PathType Container)) {
     throw "Target is not a usable Minecraft instance: missing mods directory at $modsPath"
@@ -34,6 +36,13 @@ Get-ChildItem -LiteralPath $sourcePath -Recurse -File | ForEach-Object {
     New-Item -ItemType Directory -Path $destinationDirectory -Force | Out-Null
     Copy-Item -LiteralPath $_.FullName -Destination $destination -Force
     Write-Host "Deployed $relativePath"
+}
+
+New-Item -ItemType Directory -Path $configPath -Force | Out-Null
+$exampleDestination = Join-Path $configPath "9mm-override.json.example"
+if (-not (Test-Path -LiteralPath $exampleDestination)) {
+    Copy-Item -LiteralPath $exampleSource -Destination $exampleDestination
+    Write-Host "Deployed config example 9mm-override.json.example"
 }
 
 Write-Host "CreateTacZrecipe KubeJS module deployed to $resolvedInstance"

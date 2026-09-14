@@ -1,17 +1,4 @@
 // KubeJS only permits assigning global values during startup scripts.
-const caliberKeys = [
-  "22wmr", "9mm", "45acp", "46x30", "57x28", "762x25", "357mag", "500mag", "50ae",
-  "545x39", "556x45", "58x42", "68x51fury", "762x39", "30_06", "308", "338", "45_70",
-  "762x54", "792x57", "50bmg",
-];
-const caliberDisplayNames = {
-  "22wmr": ".22 Winchester Magnum", "9mm": "9mm", "45acp": ".45 ACP", "46x30": "4.6x30mm", "57x28": "5.7x28mm",
-  "762x25": "7.62x25mm Tokarev", "357mag": ".357 Magnum", "500mag": ".500 Magnum", "50ae": ".50 AE",
-  "545x39": "5.45x39mm", "556x45": "5.56x45mm", "58x42": "5.8x42mm DBP87", "68x51fury": "6.8x51mm Fury",
-  "762x39": "7.62x39mm", "30_06": ".30-06 Springfield", "308": ".308 Winchester", "338": ".338 Lapua Magnum",
-  "45_70": ".45-70 Government", "762x54": "7.62x54mm", "792x57": "8mm Mauser", "50bmg": ".50 BMG",
-};
-
 const standardAmmo = (spec) => {
   const key = spec.key;
   const casing = spec.casing || `createtaczrecipe:empty_${key}_casing`;
@@ -34,6 +21,12 @@ const standardAmmo = (spec) => {
   const casingMetalUnits = spec.casingMetalUnits || Math.max(1, Math.ceil(metalUnits / 2));
   const bulletMetalUnits = spec.bulletMetalUnits || Math.max(1, metalUnits - casingMetalUnits);
   const chargeMaterialUnits = chargeLevel === "heavy" ? 20 : (chargeLevel === "standard" ? 4 : 1);
+  const counts = {
+    casing: spec.counts && spec.counts.casing || 1,
+    roughBullet: spec.counts && spec.counts.roughBullet || 1,
+    polishedBullet: spec.counts && spec.counts.polishedBullet || 1,
+    assembly: spec.counts && spec.counts.assembly || 1,
+  };
   return {
     key: key,
     casingMold: casingMold,
@@ -49,8 +42,8 @@ const standardAmmo = (spec) => {
     },
     inputIngredient: { casing: casingInput, polishedBullet: bulletInput, primer: primerInput, propellant: propellantInput },
     outputItem: { casing: casing, roughBullet: roughBullet, polishedBullet: polishedBullet, transitional: transitional },
-    counts: spec.counts || { casing: 1, roughBullet: 1 },
-    economy: { sourceBatch: sourceBatch, metalUnits: metalUnits, casingMetalUnits: casingMetalUnits, bulletMetalUnits: bulletMetalUnits, powderUnits: spec.powderCount || 2, chargeMaterialUnits: chargeMaterialUnits, chargeCapacity: Math.floor((spec.powderCount || 2) * 24 / chargeMaterialUnits), assemblyOutputCount: spec.assemblyOutputCount || 1 },
+    counts: counts,
+    economy: { sourceBatch: sourceBatch, metalUnits: metalUnits, casingMetalUnits: casingMetalUnits, bulletMetalUnits: bulletMetalUnits, powderUnits: spec.powderCount || 2, chargeMaterialUnits: chargeMaterialUnits, chargeCapacity: Math.floor((spec.powderCount || 2) * 24 / chargeMaterialUnits), assemblyOutputCount: counts.assembly },
     casing: casing,
     roughBullet: roughBullet,
     polishedBullet: polishedBullet,
@@ -60,7 +53,7 @@ const standardAmmo = (spec) => {
     transitional: transitional,
     final: spec.final || "tacz:ammo",
     ammoId: spec.ammoId || `tacz:${key}`,
-    polishing: spec.polishing || { type: "create:sandpaper_polishing", input: { ref: "roughBullet" }, output: { ref: "polishedBullet" } },
+    polishing: spec.polishing || { type: "create:sandpaper_polishing", input: { ref: "roughBullet" }, output: { ref: "polishedBullet", count: counts.polishedBullet } },
     // Primers use the shared recipe unless a caliber explicitly opts into an override.
     primerRecipe: spec.primerRecipe || null,
     propellantRecipe: spec.propellantRecipe || null,
@@ -76,8 +69,9 @@ const standardAmmo = (spec) => {
 
 global.createtaczrecipe = {
   definitions: [],
-  caliberKeys: caliberKeys,
-  caliberDisplayNames: caliberDisplayNames,
+  ammoCatalog: [],
+  caliberKeys: [],
+  caliberDisplayNames: {},
   standardAmmo: standardAmmo,
   registerAmmo: (definition) => {
     global.createtaczrecipe.definitions.push(definition);

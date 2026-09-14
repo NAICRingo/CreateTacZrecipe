@@ -28,8 +28,10 @@ function check(condition, message) {
 }
 
 load("src/kubejs/startup_scripts/createtaczrecipe/00_ammo_api.js");
+load("src/kubejs/startup_scripts/createtaczrecipe/01_ammo_catalog.js");
 load("src/kubejs/server_scripts/createtaczrecipe/ammo_9mm.js");
 load("src/kubejs/server_scripts/createtaczrecipe/ammo_standard.js");
+load("src/kubejs/server_scripts/createtaczrecipe/ammo_definitions.js");
 load("src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js");
 load("src/kubejs/server_scripts/createtaczrecipe/ammo_tags.js");
 

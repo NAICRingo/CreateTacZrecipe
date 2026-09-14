@@ -1,14 +1,37 @@
 # 枪包弹药配方接口
 
-通用生成器位于 `src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js`。
-口径脚本只负责声明数据并调用 `global.createtaczrecipe.registerAmmo(definition)`；9mm
-示例位于同目录的 `ammo_9mm.js`，默认常规口径位于 `ammo_standard.js`。`docs/GUNPACK-RECIPE-TEMPLATE.js` 是不会实际加载的示例定义。
+通用生成器位于 `src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js`。21 种默认口径的
+唯一数据源是 `src/kubejs/startup_scripts/createtaczrecipe/01_ammo_catalog.js`；物品、模具、标签和配方注册
+都从该 catalog 的 key 派生。`ammo_9mm.js` 与 `ammo_standard.js` 只保留兼容说明，不再重复注册数据。
+
+## 用户 JSON 覆盖
+
+把一个或多个 `.json` 文件放入实例的 `config/createtaczrecipe`，重启游戏后会按文件名排序覆盖默认
+catalog。每个文件只覆盖一个已有口径，未写字段继续使用默认值。可复制仓库中的
+`config/createtaczrecipe/9mm-override.json.example`，改名为 `9mm-override.json`：
+
+```json
+{
+  "key": "9mm",
+  "casingMetalUnits": 6
+}
+```
+
+支持覆盖：`ammoId`、`sourceBatch`、`powderCount`、`metalUnits`、`casingMetalUnits`、
+`bulletMetalUnits`、`chargeLevel`、`casingMaterial`、`bulletMaterial`、`bulletExtraIngredients`、
+`casingMold`、`bulletMold` 和 `counts`。材料使用 `{ "item": "namespace:id" }` 或
+`{ "tag": "namespace:path" }`。`counts` 可分别设置 `casing`、`roughBullet`、`polishedBullet`、
+`assembly`，例如 `{ "counts": { "casing": 40 } }` 只改变弹壳产量。
+
+每个文件独立读取和校验。JSON 语法错误、未知口径、未知字段、错误类型或越界数量只会跳过该文件；
+日志会记录文件名、口径和错误字段，不影响其他文件或默认口径。配置只覆盖配方数据，本阶段不通过
+JSON 注册新物品或新口径，也不允许任意工序编排。
 
 ## 定义字段
 
 - `key`：弹药短名，用于生成 `createtaczrecipe:*` 配方 ID。
 - `materials.casing`、`materials.bullet`：物品或标签输入，例如 `{tag: "c:plates/brass"}`。
-- `counts`：`casing` 和 `roughBullet` 的成型产量。
+- `counts`：`casing`、`roughBullet`、`polishedBullet` 和 `assembly` 各阶段产量。
 - `sourceBatch`、`powderCount`：原版枪匠台批量与火药单位，保存于 `economy` 供平衡核对。
   装药由下述公共链生产，不再为每个口径重复生成相同输出的混合配方。
   当前 Create/CDG 配方结果遵守 Minecraft 单堆上限 99；因此 22 WMR 的原始 100 发批量转换为 96 发合法批次，
