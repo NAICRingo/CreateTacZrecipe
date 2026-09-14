@@ -15,8 +15,8 @@
   ];
   const enabled = {};
   try {
-    const document = typeof JsonIO !== "undefined" ? JsonIO.read("config/createtaczrecipe/gunpack_overrides.json") : null;
-    if (document && Array.isArray(document.disabled)) document.disabled.forEach((key) => { enabled[key] = false; });
+    var ctzGunpackOverridesDocument = typeof JsonIO !== "undefined" ? JsonIO.read("config/createtaczrecipe/gunpack_overrides.json") : null;
+    if (ctzGunpackOverridesDocument && Array.isArray(ctzGunpackOverridesDocument.disabled)) ctzGunpackOverridesDocument.disabled.forEach((key) => { enabled[key] = false; });
   } catch (error) {
     console.log(`[CreateTacZrecipe] unable to read gunpack overrides; built-in gunpack catalog remains active: ${error}`);
   }
