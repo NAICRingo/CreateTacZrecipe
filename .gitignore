@@ -10,6 +10,7 @@ logs/
 patchouli_data.json
 config/*-client.json
 config/*.properties
+config/takesapillage.json
 references/instance-snapshot/logs/
 references/instance-snapshot/crash-reports/
 references/instance-snapshot/debug/
