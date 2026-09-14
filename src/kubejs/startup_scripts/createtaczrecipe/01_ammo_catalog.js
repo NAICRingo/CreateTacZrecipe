@@ -43,6 +43,7 @@
 
   global.createtaczrecipe.ammoCatalog = catalog;
   global.createtaczrecipe.caliberKeys = catalog.map((entry) => entry.key);
+  global.createtaczrecipe.defaultCaliberKeys = global.createtaczrecipe.caliberKeys.slice();
   global.createtaczrecipe.caliberDisplayNames = names;
 
   // Startup-time additions are read before item, mold and tag registration. This is
@@ -67,14 +68,10 @@
         continue;
       }
       var ctzMold = ctzEntry.molds || {};
-      if (typeof ctzMold.casing !== "string" || typeof ctzMold.bullet !== "string") {
-        console.log(`[CreateTacZrecipe] skipped config addition ${ctzAdditionPath}#additions[${ctzIndex}] for ${ctzKey}: molds.casing and molds.bullet are required`);
-        continue;
-      }
       var ctzSpec = {
         key: ctzKey, ammoId: ctzEntry.ammoId || `tacz:${ctzKey}`, displayName: ctzEntry.displayName || ctzKey,
         casing: ctzOutput.casing, roughBullet: ctzOutput.roughBullet, polishedBullet: ctzOutput.polishedBullet, transitional: ctzOutput.transitional,
-        casingMold: ctzMold.casing, bulletMold: ctzMold.bullet,
+        casingMold: ctzMold.casing || "createtaczrecipe_external_casing", bulletMold: ctzMold.bullet || "createtaczrecipe_external_bullet",
         casingMaterial: ctzEntry.materials && ctzEntry.materials.casing, bulletMaterial: ctzEntry.materials && ctzEntry.materials.bullet,
         casingMetalUnits: ctzEntry.materials && ctzEntry.materials.casingUnits, bulletMetalUnits: ctzEntry.materials && ctzEntry.materials.bulletUnits,
         chargeLevel: ctzEntry.chargeLevel, counts: ctzEntry.counts, bulletExtraIngredients: ctzEntry.bulletExtraIngredients,
@@ -91,6 +88,7 @@
       var ctzDefinition = global.createtaczrecipe.standardAmmo(ctzSpec);
       ctzDefinition.displayName = ctzSpec.displayName;
       ctzDefinition.dynamic = true;
+      ctzDefinition.visuals = ctzEntry.visuals || {};
       ctzAdditions.push(ctzDefinition);
       catalog.push(ctzDefinition);
       names[ctzKey] = ctzSpec.displayName;

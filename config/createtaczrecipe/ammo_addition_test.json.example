@@ -1,24 +1,24 @@
 {
   "additions": [
     {
-      "key": "demo45",
-      "ammoId": "tacz:demo45",
-      "displayName": "Demo .45",
+      "key": "12g",
+      "ammoId": "tacz:12g",
+      "displayName": "12 Gauge",
       "outputItem": {
-        "casing": "createtaczrecipe:empty_demo45_casing",
-        "roughBullet": "createtaczrecipe:rough_demo45_bullet",
-        "polishedBullet": "createtaczrecipe:polished_demo45_bullet",
-        "transitional": "createtaczrecipe:incomplete_demo45_round"
+        "casing": "createtaczrecipe:empty_12g_casing",
+        "roughBullet": "createtaczrecipe:rough_12g_bullet",
+        "polishedBullet": "createtaczrecipe:polished_12g_bullet",
+        "transitional": "createtaczrecipe:incomplete_12g_round"
       },
-      "molds": { "casing": "createtaczrecipe_demo45_casing", "bullet": "createtaczrecipe_demo45_bullet" },
+      "molds": { "casing": "createtaczrecipe_external_casing", "bullet": "createtaczrecipe_external_bullet" },
       "materials": {
         "casing": { "tag": "createtaczrecipe:materials/brass_blanks" },
         "bullet": { "tag": "createtaczrecipe:materials/copper_blanks" },
         "casingUnits": 5,
         "bulletUnits": 5
       },
-      "chargeLevel": "light",
-      "counts": { "casing": 20, "roughBullet": 20, "polishedBullet": 1, "assembly": 1 }
+      "chargeLevel": "standard",
+      "counts": { "casing": 24, "roughBullet": 24, "polishedBullet": 1, "assembly": 1 }
     }
   ]
 }

@@ -93,7 +93,7 @@
       log(`config ${configPath} not found; using all defaults`);
       return catalog;
     }
-    const overrides = Array.isArray(document) ? document : document.overrides;
+    const overrides = Array.isArray(document) ? document : (document.overrides === undefined ? [] : document.overrides);
     if (!Array.isArray(overrides)) {
       log(`invalid config ${configPath}: field overrides must be an array; using all defaults`);
       return catalog;
@@ -119,6 +119,6 @@
   };
 
   loadOverrides(global.createtaczrecipe.ammoCatalog).forEach((spec) => {
-    global.createtaczrecipe.registerAmmo(global.createtaczrecipe.standardAmmo(spec));
+    global.createtaczrecipe.registerAmmo(spec.dynamic ? spec : global.createtaczrecipe.standardAmmo(spec));
   });
 })();

@@ -10,7 +10,7 @@ StartupEvents.registry("item", (event) => {
     ["heavy_propellant_charge", "kubejs:item/createtaczrecipe_light_propellant_charge"],
     ["incomplete_9mm_round", "kubejs:item/createtaczrecipe_incomplete_9mm_round"],
   ];
-  global.createtaczrecipe.caliberKeys.forEach((key) => {
+  global.createtaczrecipe.defaultCaliberKeys.forEach((key) => {
     if (key === "9mm") return;
     items.push([`empty_${key}_casing`, "kubejs:item/createtaczrecipe_empty_9mm_casing"]);
     items.push([`rough_${key}_bullet`, "kubejs:item/createtaczrecipe_rough_9mm_bullet"]);
@@ -21,9 +21,15 @@ StartupEvents.registry("item", (event) => {
   // External definitions may choose project-namespace item IDs. Register only
   // those IDs; IDs owned by another mod are intentionally left untouched.
   (global.createtaczrecipe.externalAmmo || []).forEach((ammo) => {
-    [ammo.casing, ammo.roughBullet, ammo.polishedBullet, ammo.transitional].forEach((id) => {
+    const externalItems = [
+      [ammo.casing, ammo.visuals.casing || "kubejs:item/createtaczrecipe_empty_9mm_casing"],
+      [ammo.roughBullet, ammo.visuals.roughBullet || "kubejs:item/createtaczrecipe_rough_9mm_bullet"],
+      [ammo.polishedBullet, ammo.visuals.polishedBullet || "kubejs:item/createtaczrecipe_polished_9mm_bullet"],
+      [ammo.transitional, ammo.visuals.transitional || "kubejs:item/createtaczrecipe_incomplete_9mm_round"],
+    ];
+    externalItems.forEach(([id, texture]) => {
       if (id.indexOf("createtaczrecipe:") === 0 && !items.some((entry) => `createtaczrecipe:${entry[0]}` === id)) {
-        items.push([id.substring("createtaczrecipe:".length), "kubejs:item/createtaczrecipe_empty_9mm_casing"]);
+        items.push([id.substring("createtaczrecipe:".length), texture]);
       }
     });
   });

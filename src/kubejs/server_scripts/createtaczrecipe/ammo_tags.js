@@ -1,5 +1,5 @@
 ServerEvents.tags("item", (event) => {
-  const keys = global.createtaczrecipe.caliberKeys;
+  const keys = global.createtaczrecipe.defaultCaliberKeys;
   event.add("createtaczrecipe:materials/brass_blanks", "createdeco:brass_coin");
   event.add("createtaczrecipe:materials/copper_blanks", "createdeco:copper_coin");
   event.add("createtaczrecipe:materials/iron_plates", "#c:plates/iron");
@@ -20,6 +20,10 @@ ServerEvents.tags("item", (event) => {
     event.add(`createtaczrecipe:cartridges/incomplete/${key}`, `createtaczrecipe:incomplete_${key}_round`);
   });
   (global.createtaczrecipe.externalAmmo || []).forEach((ammo) => {
+    event.add("createtaczrecipe:casings/empty", ammo.casing);
+    event.add("createtaczrecipe:projectiles/rough", ammo.roughBullet);
+    event.add("createtaczrecipe:projectiles/polished", ammo.polishedBullet);
+    event.add("createtaczrecipe:cartridges/incomplete", ammo.transitional);
     event.add(`createtaczrecipe:casings/empty/${ammo.key}`, ammo.casing);
     event.add(`createtaczrecipe:projectiles/rough/${ammo.key}`, ammo.roughBullet);
     event.add(`createtaczrecipe:projectiles/polished/${ammo.key}`, ammo.polishedBullet);
