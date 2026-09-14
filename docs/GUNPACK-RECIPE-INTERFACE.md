@@ -6,38 +6,43 @@
 
 ## 用户 JSON 覆盖
 
-把一个或多个 `.json` 文件放入实例的 `config/createtaczrecipe`，重启游戏后会按文件名排序覆盖默认
-catalog。每个文件只覆盖一个已有口径，未写字段继续使用默认值。可复制仓库中的
-`config/createtaczrecipe/9mm-override.json.example`，改名为 `9mm-override.json`：
+把固定文件 `ammo_overrides.json` 放入实例的 `config/createtaczrecipe`，重启游戏后会通过 KubeJS
+安全接口 `JsonIO.read(...)` 读取。文件中的每一项覆盖一个已有口径，未写字段继续使用默认值。
+可复制仓库中的 `config/createtaczrecipe/ammo_overrides.json.example` 并去掉 `.example` 后缀：
 
 ```json
 {
-  "key": "9mm",
-  "casingMetalUnits": 6
+  "overrides": [
+    {
+      "key": "9mm",
+      "casingMetalUnits": 6
+    }
+  ]
 }
 ```
 
-支持覆盖：`ammoId`、`sourceBatch`、`powderCount`、`metalUnits`、`casingMetalUnits`、
-`bulletMetalUnits`、`chargeLevel`、`casingMaterial`、`bulletMaterial`、`bulletExtraIngredients`、
+支持覆盖：`ammoId`、`casingMetalUnits`、`bulletMetalUnits`、`chargeLevel`、
+`casingMaterial`、`bulletMaterial`、`bulletExtraIngredients`、
 `casingMold`、`bulletMold` 和 `counts`。材料使用 `{ "item": "namespace:id" }` 或
 `{ "tag": "namespace:path" }`。`counts` 可分别设置 `casing`、`roughBullet`、`polishedBullet`、
 `assembly`，例如 `{ "counts": { "casing": 40 } }` 只改变弹壳产量。
 
-每个文件独立读取和校验。JSON 语法错误、未知口径、未知字段、错误类型或越界数量只会跳过该文件；
-日志会记录文件名、口径和错误字段，不影响其他文件或默认口径。配置只覆盖配方数据，本阶段不通过
-JSON 注册新物品或新口径，也不允许任意工序编排。
+每条覆盖独立校验。未知口径、未知字段、错误类型或越界数量只跳过该条，日志记录数组下标、口径、
+字段和原因。文件不存在、JSON 损坏、读取失败或根结构错误时，加载器会明确记录日志并使用全部默认
+口径。配置只覆盖配方数据，本阶段不通过 JSON 注册新物品或新口径，也不允许任意工序编排。
 
 ## 定义字段
 
 - `key`：弹药短名，用于生成 `createtaczrecipe:*` 配方 ID。
 - `materials.casing`、`materials.bullet`：物品或标签输入，例如 `{tag: "c:plates/brass"}`。
 - `counts`：`casing`、`roughBullet`、`polishedBullet` 和 `assembly` 各阶段产量。
-- `sourceBatch`、`powderCount`：原版枪匠台批量与火药单位，保存于 `economy` 供平衡核对。
+- `sourceBatch`、`powderCount`、`metalUnits`：默认 catalog 中保存的原版枪匠台批量、火药单位和
+  总金属成本，只用于平衡核对，不是 JSON 可覆盖字段，也不会单独改变实际压铸消耗。
   装药由下述公共链生产，不再为每个口径重复生成相同输出的混合配方。
   当前 Create/CDG 配方结果遵守 Minecraft 单堆上限 99；因此 22 WMR 的原始 100 发批量转换为 96 发合法批次，
   不使用未经确认的多结果堆拆分格式。
 - `casingMetalUnits`、`bulletMetalUnits`：分别覆盖弹壳和弹头压铸所需的重复材料输入数。
-  未填写时由 `metalUnits` 近似均分。CDG 1.3.15 的一条 `compression_molding` 配方最多接受
+  catalog 建立默认数据时由 `metalUnits` 近似均分；实际配方只读取这两个分配字段。CDG 1.3.15 的一条 `compression_molding` 配方最多接受
   64 个物品输入；附加弹头材料也计入这个上限。框架会在注册该口径的任何配方前检查两条压铸配方，
   超限时记录口径、配方 ID 和实际输入数，并只跳过该口径。.50 BMG 明确使用 60 份黄铜坯制作弹壳，
   50 份铜坯加 12 个青金石和 1 根烈焰棒制作弹头，输入数分别为 60 和 63。
@@ -99,9 +104,11 @@ JSON 注册新物品或新口径，也不允许任意工序编排。
 
 ## 添加常规口径
 
-在 `ammo_standard.js` 的数据表增加 `[key, powderCount, sourceBatch, metalUnits]`，
-再调用 `standardAmmo`。`powderCount` 对应 TaCZ 默认枪匠台配方的火药消耗；`sourceBatch` 仅记录原始批量，
-因为 TaCZ 并未规定 CDG 模具的单次壳体/弹头产量。不要为同一 AmmoId 再注册第二条定义。
+默认口径维护入口是 `startup_scripts/createtaczrecipe/01_ammo_catalog.js`，不再修改
+`ammo_standard.js`。新增默认口径需要同时准备固定物品、语言和模具资源；外部 JSON 在本阶段只能覆盖
+catalog 已有 key，不能动态注册新口径。`powderCount`、`sourceBatch` 和 `metalUnits` 是来源经济的记录值；
+实际压铸输入由 `casingMetalUnits` / `bulletMetalUnits` 决定，产量由 `counts` 决定。不要为同一 AmmoId
+再注册第二条定义。
 
 符合现有命名规则的新口径物品（至少注册 `createtaczrecipe:empty_<key>_casing`）会由原生创造栏
 动态发现；随后按稳定的 key 排序加入该口径的弹壳模具、弹头模具、弹壳、粗制弹头、抛光弹头和

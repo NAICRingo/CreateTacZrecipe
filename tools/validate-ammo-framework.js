@@ -11,6 +11,7 @@ let tagCallback;
 const context = vm.createContext({
   console: console,
   global: {},
+  JsonIO: { read: () => null },
   Item: { of: () => ({ isEmpty: () => false }) },
   ServerEvents: {
     recipes: (callback) => { recipeCallback = callback; },

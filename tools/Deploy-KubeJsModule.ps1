@@ -8,7 +8,7 @@ $resolvedInstance = (Resolve-Path -LiteralPath $InstancePath).Path
 $modsPath = Join-Path $resolvedInstance "mods"
 $targetPath = Join-Path $resolvedInstance "kubejs"
 $sourcePath = Join-Path (Split-Path -Parent $PSScriptRoot) "src\kubejs"
-$exampleSource = Join-Path (Split-Path -Parent $PSScriptRoot) "config\createtaczrecipe\9mm-override.json.example"
+$exampleSource = Join-Path (Split-Path -Parent $PSScriptRoot) "config\createtaczrecipe\ammo_overrides.json.example"
 $configPath = Join-Path $resolvedInstance "config\createtaczrecipe"
 
 if (-not (Test-Path -LiteralPath $modsPath -PathType Container)) {
@@ -39,10 +39,10 @@ Get-ChildItem -LiteralPath $sourcePath -Recurse -File | ForEach-Object {
 }
 
 New-Item -ItemType Directory -Path $configPath -Force | Out-Null
-$exampleDestination = Join-Path $configPath "9mm-override.json.example"
+$exampleDestination = Join-Path $configPath "ammo_overrides.json.example"
 if (-not (Test-Path -LiteralPath $exampleDestination)) {
     Copy-Item -LiteralPath $exampleSource -Destination $exampleDestination
-    Write-Host "Deployed config example 9mm-override.json.example"
+    Write-Host "Deployed config example ammo_overrides.json.example"
 }
 
 Write-Host "CreateTacZrecipe KubeJS module deployed to $resolvedInstance"

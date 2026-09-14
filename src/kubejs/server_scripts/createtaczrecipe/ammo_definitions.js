@@ -2,7 +2,7 @@
 (() => {
   const log = (message) => console.log(`[CreateTacZrecipe] ${message}`);
   const allowedFields = {
-    key: true, ammoId: true, sourceBatch: true, powderCount: true, metalUnits: true,
+    key: true, ammoId: true,
     casingMetalUnits: true, bulletMetalUnits: true, chargeLevel: true,
     casingMaterial: true, bulletMaterial: true, bulletExtraIngredients: true,
     casingMold: true, bulletMold: true, counts: true,
@@ -33,7 +33,7 @@
     const key = override.key;
     if (typeof key !== "string" || !knownKeys[key]) return fail(file, key, "key", "must name one of the registered default calibers");
     for (const field in override) if (!allowedFields[field]) return fail(file, key, field, "unknown or non-overridable field");
-    for (const field of ["sourceBatch", "powderCount", "metalUnits", "casingMetalUnits", "bulletMetalUnits"]) {
+    for (const field of ["casingMetalUnits", "bulletMetalUnits"]) {
       if (override[field] !== undefined && (!Number.isInteger(override[field]) || override[field] < 1 || override[field] > 99)) return fail(file, key, field, "must be an integer in range 1..99");
     }
     if (override.ammoId !== undefined && (typeof override.ammoId !== "string" || !resourcePattern.test(override.ammoId))) return fail(file, key, "ammoId", "must be a valid namespace:path resource ID");
@@ -78,42 +78,42 @@
     return true;
   };
   const loadOverrides = (catalog) => {
-    if (typeof Java === "undefined") return catalog;
-    const Files = Java.loadClass("java.nio.file.Files");
-    const Paths = Java.loadClass("java.nio.file.Paths");
-    const StandardCharsets = Java.loadClass("java.nio.charset.StandardCharsets");
-    const directory = Paths.get("config", "createtaczrecipe");
-    try { Files.createDirectories(directory); } catch (error) { log(`unable to create config directory ${directory}: ${error}`); return catalog; }
+    const configPath = "config/createtaczrecipe/ammo_overrides.json";
     const knownKeys = {};
     const byKey = {};
     catalog.forEach((entry) => { knownKeys[entry.key] = true; byKey[entry.key] = copyValue(entry); });
-    let stream;
+    let document = null;
     try {
-      stream = Files.newDirectoryStream(directory, "*.json");
-      const paths = [];
-      const iterator = stream.iterator();
-      while (iterator.hasNext()) paths.push(iterator.next());
-      paths.sort((a, b) => String(a.getFileName()).localeCompare(String(b.getFileName())));
-      paths.forEach((path) => {
-        const file = String(path.getFileName());
-        let override;
-        let raw = "";
-        try { raw = String(Files.readString(path, StandardCharsets.UTF_8)); override = JSON.parse(raw); }
-        catch (error) {
-          const match = raw.match(/"key"\s*:\s*"([^"]+)"/);
-          fail(file, match ? match[1] : "<unknown>", "<json>", String(error));
-          return;
-        }
-        if (!validateOverride(file, override, knownKeys)) return;
-        const resolved = mergeOverride(byKey[override.key], override);
-        if (!validateResolved(file, resolved)) return;
-        byKey[override.key] = resolved;
-        log(`applied config override ${file} for caliber ${override.key}`);
-      });
+      document = JsonIO.read(configPath);
     } catch (error) {
-      log(`unable to enumerate config overrides in ${directory}: ${error}`);
-    } finally {
-      if (stream) try { stream.close(); } catch (error) { log(`unable to close config directory stream: ${error}`); }
+      log(`unable to read ${configPath}; using all defaults: ${error}`);
+      return catalog;
+    }
+    if (document === null || document === undefined) {
+      log(`config ${configPath} not found; using all defaults`);
+      return catalog;
+    }
+    const overrides = Array.isArray(document) ? document : document.overrides;
+    if (!Array.isArray(overrides)) {
+      log(`invalid config ${configPath}: field overrides must be an array; using all defaults`);
+      return catalog;
+    }
+    let index;
+    let overrideEntry;
+    let source;
+    let resolved;
+    let changedFields;
+    let changedField;
+    for (index = 0; index < overrides.length; index++) {
+      overrideEntry = overrides[index];
+      source = `${configPath}#overrides[${index}]`;
+      if (!validateOverride(source, overrideEntry, knownKeys)) continue;
+      resolved = mergeOverride(byKey[overrideEntry.key], overrideEntry);
+      if (!validateResolved(source, resolved)) continue;
+      byKey[overrideEntry.key] = resolved;
+      changedFields = [];
+      for (changedField in overrideEntry) if (changedField !== "key") changedFields.push(`${changedField}=${JSON.stringify(overrideEntry[changedField])}`);
+      log(`applied config override ${source} for caliber ${overrideEntry.key}: ${changedFields.join(", ")}`);
     }
     return catalog.map((entry) => byKey[entry.key]);
   };
