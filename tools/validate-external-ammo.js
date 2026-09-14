@@ -29,14 +29,17 @@ load("src/kubejs/server_scripts/createtaczrecipe/ammo_tags.js");
 tagCallback({ add: (tag, value) => { if (!tags.has(tag)) tags.set(tag, []); tags.get(tag).push(value); } });
 recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recipe: recipe }) }) });
 
-check(context.global.createtaczrecipe.definitions.length === 22, "external caliber did not preserve 21 defaults");
-check(recipes.length === 137, `expected 137 recipes with one external caliber, got ${recipes.length}`);
-check(recipes.filter((entry) => entry.id.includes("/12g_") || entry.id.includes("/12g")).length === 6, "12g must generate six recipes");
-const assembly = recipes.find((entry) => entry.id === "createtaczrecipe:ammo/12g_sequenced_assembly").recipe;
-check(assembly.results[0].id === "tacz:ammo", "12g final item is not tacz:ammo");
-check(assembly.results[0].components["minecraft:custom_data"].AmmoId === "tacz:12g", "12g AmmoId component mismatch");
-check((tags.get("createtaczrecipe:casings/empty/12g") || []).includes("createtaczrecipe:empty_12g_casing"), "12g casing tag is empty");
+check(context.global.createtaczrecipe.definitions.length === 23, "external caliber did not preserve 22 defaults");
+check(recipes.length === 143, `expected 143 recipes with one external caliber, got ${recipes.length}`);
+check(recipes.filter((entry) => entry.id.includes("/custom_test_") || entry.id.includes("/custom_test")).length === 6, "custom_test must generate six recipes");
+const assembly = recipes.find((entry) => entry.id === "createtaczrecipe:ammo/custom_test_sequenced_assembly").recipe;
+check(assembly.results[0].id === "tacz:ammo", "custom_test final item is not tacz:ammo");
+check(assembly.results[0].components["minecraft:custom_data"].AmmoId === "tacz:12g", "custom_test AmmoId component mismatch");
+check((tags.get("createtaczrecipe:casings/empty/custom_test") || []).includes("createtaczrecipe:empty_custom_test_casing"), "custom_test casing tag is empty");
+check(assembly.sequence.map((step) => step.type).join(",") === "create:deploying,create:deploying,create:filling,create:cutting,create:deploying,create:deploying,create:pressing", "custom sequence order mismatch");
+check(assembly.sequence[1].keep_held_item === true, "custom keep_held_item was not preserved");
+check(assembly.sequence[2].ingredients[1].type === "neoforge:single" && assembly.sequence[2].ingredients[1].fluid === "minecraft:water" && assembly.sequence[2].ingredients[1].amount === 250, "custom filling ingredient mismatch");
 for (const name of ["createtaczrecipe_external_casing.png", "createtaczrecipe_external_bullet.png"]) {
   check(fs.existsSync(path.join(root, "src/kubejs/assets/kubejs/textures/item/mold", name)), `missing mold fallback ${name}`);
 }
-console.log("CreateTacZrecipe external ammo validation passed: 22 definitions, 137 recipes, AmmoId tacz:12g, fallback resources present.");
+console.log("CreateTacZrecipe external ammo validation passed: 23 definitions, 143 recipes, custom sequence and fallback resources present.");

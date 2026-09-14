@@ -43,9 +43,9 @@ tagCallback({ add: (tag, value) => {
 recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recipe: recipe }) }) });
 
 const definitions = context.global.createtaczrecipe.definitions;
-check(definitions.length === 21, `expected 21 definitions, got ${definitions.length}`);
-check(recipes.length === 131, `expected 131 recipes, got ${recipes.length}`);
-check(new Set(definitions.map((definition) => definition.ammoId)).size === 21, "duplicate AmmoId");
+check(definitions.length === 22, `expected 22 definitions, got ${definitions.length}`);
+check(recipes.length === 137, `expected 137 recipes, got ${recipes.length}`);
+check(new Set(definitions.map((definition) => definition.ammoId)).size === 22, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
 for (const definition of definitions) {
@@ -111,5 +111,16 @@ check(bullet50.ingredients.filter((ingredient) => ingredient.item === "minecraft
 check(bullet50.ingredients.filter((ingredient) => ingredient.item === "minecraft:blaze_rod").length === 1, ".50 BMG blaze rod must be in bullet molding");
 check(casing50.ingredients.length === 60, `.50 BMG casing molding must have 60 inputs, got ${casing50.ingredients.length}`);
 check(bullet50.ingredients.length === 63, `.50 BMG bullet molding must have 63 inputs, got ${bullet50.ingredients.length}`);
+
+const ammo9mm = definitions.find((value) => value.key === "9mm");
+const ammo12g = definitions.find((value) => value.key === "12g");
+check(ammo9mm.processPreset === "conventional" && ammo9mm.operations.length === 4, "9mm conventional sequence changed");
+check(ammo12g.processPreset === "shotgun" && ammo12g.ammoId === "tacz:12g", "12G preset or AmmoId mismatch");
+check(ammo12g.operations.map((step) => step.type).join(",") === "create:deploying,create:deploying,create:deploying,create:cutting,create:pressing", "12G shotgun operation order mismatch");
+const casing12g = recipes.find((entry) => entry.id === "createtaczrecipe:components/12g_casing").recipe;
+const bullet12g = recipes.find((entry) => entry.id === "createtaczrecipe:components/12g_rough_bullet").recipe;
+check(casing12g.ingredients.length === 9 && casing12g.results[0].count === 18, "12G casing balance mismatch");
+check(bullet12g.ingredients.length === 24 && bullet12g.results[0].count === 18, "12G projectile balance mismatch");
+check(bullet12g.ingredients.filter((ingredient) => ingredient.tag === "c:nuggets/iron").length === 18, "12G iron input mismatch");
 
 console.log(`CreateTacZrecipe static validation passed: ${definitions.length} definitions, ${recipes.length} recipes, ${tags.size} item tags.`);

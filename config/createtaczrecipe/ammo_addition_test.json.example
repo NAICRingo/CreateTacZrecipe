@@ -1,14 +1,14 @@
 {
   "additions": [
     {
-      "key": "12g",
+      "key": "custom_test",
       "ammoId": "tacz:12g",
-      "displayName": "12 Gauge",
+      "displayName": "Custom Process Test (12 Gauge)",
       "outputItem": {
-        "casing": "createtaczrecipe:empty_12g_casing",
-        "roughBullet": "createtaczrecipe:rough_12g_bullet",
-        "polishedBullet": "createtaczrecipe:polished_12g_bullet",
-        "transitional": "createtaczrecipe:incomplete_12g_round"
+        "casing": "createtaczrecipe:empty_custom_test_casing",
+        "roughBullet": "createtaczrecipe:rough_custom_test_bullet",
+        "polishedBullet": "createtaczrecipe:polished_custom_test_bullet",
+        "transitional": "createtaczrecipe:incomplete_custom_test_round"
       },
       "molds": { "casing": "createtaczrecipe_external_casing", "bullet": "createtaczrecipe_external_bullet" },
       "materials": {
@@ -18,7 +18,46 @@
         "bulletUnits": 5
       },
       "chargeLevel": "standard",
-      "counts": { "casing": 24, "roughBullet": 24, "polishedBullet": 1, "assembly": 1 }
+      "counts": { "casing": 12, "roughBullet": 12, "polishedBullet": 1, "assembly": 1 },
+      "processPreset": "custom",
+      "operations": [
+        {
+          "type": "create:deploying",
+          "ingredients": [{ "ref": "transitional" }, { "tag": "createtaczrecipe:materials/primers" }],
+          "results": [{ "ref": "transitional" }]
+        },
+        {
+          "type": "create:deploying",
+          "ingredients": [{ "ref": "transitional" }, { "item": "minecraft:flint" }],
+          "results": [{ "ref": "transitional" }],
+          "keep_held_item": true
+        },
+        {
+          "type": "create:filling",
+          "ingredients": [{ "ref": "transitional" }, { "type": "neoforge:single", "amount": 250, "fluid": "minecraft:water" }],
+          "results": [{ "ref": "transitional" }]
+        },
+        {
+          "type": "create:cutting",
+          "ingredients": [{ "ref": "transitional" }],
+          "results": [{ "ref": "transitional" }]
+        },
+        {
+          "type": "create:deploying",
+          "ingredients": [{ "ref": "transitional" }, { "tag": "createtaczrecipe:propellants/standard" }],
+          "results": [{ "ref": "transitional" }]
+        },
+        {
+          "type": "create:deploying",
+          "ingredients": [{ "ref": "transitional" }, { "tag": "createtaczrecipe:projectiles/polished/custom_test" }],
+          "results": [{ "ref": "transitional" }]
+        },
+        {
+          "type": "create:pressing",
+          "ingredients": [{ "ref": "transitional" }],
+          "results": [{ "ref": "transitional" }]
+        }
+      ]
     }
   ]
 }

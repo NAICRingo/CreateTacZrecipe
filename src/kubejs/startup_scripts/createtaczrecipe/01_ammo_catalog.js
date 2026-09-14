@@ -5,7 +5,7 @@
     "762x25": "7.62x25mm Tokarev", "357mag": ".357 Magnum", "500mag": ".500 Magnum", "50ae": ".50 AE",
     "545x39": "5.45x39mm", "556x45": "5.56x45mm", "58x42": "5.8x42mm DBP87", "68x51fury": "6.8x51mm Fury",
     "762x39": "7.62x39mm", "30_06": ".30-06 Springfield", "308": ".308 Winchester", "338": ".338 Lapua Magnum",
-    "45_70": ".45-70 Government", "762x54": "7.62x54mm", "792x57": "8mm Mauser", "50bmg": ".50 BMG",
+    "45_70": ".45-70 Government", "762x54": "7.62x54mm", "792x57": "8mm Mauser", "50bmg": ".50 BMG", "12g": "12 Gauge",
   };
   const rows = [
     ["22wmr", 2, 96, 10, "light"], ["9mm", 2, 50, 10, "light"], ["45acp", 2, 30, 10, "light"],
@@ -15,6 +15,7 @@
     ["68x51fury", 5, 40, 15, "standard"], ["762x39", 3, 35, 15, "standard"], ["30_06", 6, 32, 20, "standard"],
     ["308", 10, 60, 30, "standard"], ["338", 8, 18, 25, "standard"], ["45_70", 7, 36, 30, "standard"],
     ["762x54", 8, 60, 25, "standard"], ["792x57", 6, 48, 20, "standard"], ["50bmg", 20, 24, 110, "heavy"],
+    ["12g", 6, 18, 33, "standard"],
   ];
   const lapisByKey = { "57x28": 5, "500mag": 5, "50ae": 5, "308": 1, "338": 4, "45_70": 5, "50bmg": 12 };
   const catalog = rows.map((row) => {
@@ -22,6 +23,7 @@
     const sourceBatch = row[2];
     const extras = lapisByKey[key] ? [{ item: "minecraft:lapis_lazuli", amount: lapisByKey[key] }] : [];
     if (key === "50bmg") extras.push({ item: "minecraft:blaze_rod", amount: 1 });
+    if (key === "12g") extras.push({ tag: "c:nuggets/iron", amount: 18 });
     return {
       key: key,
       displayName: names[key],
@@ -29,9 +31,10 @@
       sourceBatch: sourceBatch,
       powderCount: row[1],
       metalUnits: row[3],
-      casingMetalUnits: key === "50bmg" ? 60 : Math.max(1, Math.ceil(row[3] / 2)),
-      bulletMetalUnits: key === "50bmg" ? 50 : Math.max(1, row[3] - Math.ceil(row[3] / 2)),
+      casingMetalUnits: key === "50bmg" ? 60 : (key === "12g" ? 9 : Math.max(1, Math.ceil(row[3] / 2))),
+      bulletMetalUnits: key === "50bmg" ? 50 : (key === "12g" ? 6 : Math.max(1, row[3] - Math.ceil(row[3] / 2))),
       chargeLevel: row[4],
+      processPreset: key === "12g" ? "shotgun" : "conventional",
       casingMaterial: { tag: "createtaczrecipe:materials/brass_blanks" },
       bulletMaterial: { tag: "createtaczrecipe:materials/copper_blanks" },
       bulletExtraIngredients: extras,
@@ -75,6 +78,7 @@
         casingMaterial: ctzEntry.materials && ctzEntry.materials.casing, bulletMaterial: ctzEntry.materials && ctzEntry.materials.bullet,
         casingMetalUnits: ctzEntry.materials && ctzEntry.materials.casingUnits, bulletMetalUnits: ctzEntry.materials && ctzEntry.materials.bulletUnits,
         chargeLevel: ctzEntry.chargeLevel, counts: ctzEntry.counts, bulletExtraIngredients: ctzEntry.bulletExtraIngredients,
+        processPreset: ctzEntry.processPreset || "conventional", operations: ctzEntry.operations,
         sourceBatch: ctzEntry.sourceBatch || (ctzEntry.counts && ctzEntry.counts.casing) || 1,
       };
       if (!ctzSpec.casingMaterial || !ctzSpec.bulletMaterial || !Number.isInteger(ctzSpec.casingMetalUnits) || !Number.isInteger(ctzSpec.bulletMetalUnits)) {

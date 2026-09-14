@@ -1,6 +1,6 @@
 # 枪包弹药配方接口
 
-通用生成器位于 `src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js`。21 种默认口径的
+通用生成器位于 `src/kubejs/server_scripts/createtaczrecipe/00_ammo_framework.js`。22 种默认口径（含 12G）的
 唯一数据源是 `src/kubejs/startup_scripts/createtaczrecipe/01_ammo_catalog.js`；物品、模具、标签和配方注册
 都从该 catalog 的 key 派生。`ammo_9mm.js` 与 `ammo_standard.js` 只保留兼容说明，不再重复注册数据。
 
@@ -34,7 +34,8 @@
 中间物品必须已由对应模组注册。新增定义需要 `key`、`ammoId`、`outputItem`、`materials`、
 `chargeLevel` 和 `counts`，可复制 `config/createtaczrecipe/ammo_addition_test.json.example`。
 
-测试示例使用默认枪包真实存在的 `tacz:12g`。最终 `tacz:ammo` 的名称和图标由 TaCZ 根据
+外部新增示例用独立 key `custom_test` 引用默认枪包真实存在的 `tacz:12g`，不会与默认 12G 配方 ID 冲突。
+最终 `tacz:ammo` 的名称和图标由 TaCZ 根据
 `minecraft:custom_data.AmmoId` 解析，框架不会复制枪包视觉资源。
 
 ## 定义字段
@@ -68,9 +69,13 @@
   只有定义显式提供 `primerRecipe` 时才会额外生成 `<key>_primer`。`propellantRecipe` 同样仅供显式覆盖；
   默认使用公共装药链。
 - `operations`：序列组装步骤数组。当前仅允许已确认的 `create:deploying`、
-  `create:pressing`、`create:cutting`。每步保留定义中的额外字段（例如
+  `create:pressing`、`create:cutting`、`create:filling`。每步保留定义中的额外字段（例如
   `keep_held_item`），并原样传给 Create。输入和输出可以用 `{ref: "primer"}`、
-  `{ref: "transitional"}` 等引用定义字段；更换实际物品 ID 后所有工序会自动跟随。
+  `{ref: "transitional"}` 等引用定义字段；更换实际物品 ID 后所有工序会自动跟随。注液的第二个
+  ingredient 使用 `{ "type": "neoforge:single", "fluid": "namespace:id", "amount": 250 }`；
+  `amount` 是 mB，必须为正整数。
+- `processPreset`：`conventional` 使用原有三次部署加最终辊压；`shotgun` 在弹丸部署后增加切割，
+  再最终辊压；`custom` 完全读取 `operations`。选择 `custom` 时必须提供非空、合法的工序数组。
 - `final`、`ammoId`：成品物品和 TaCZ AmmoId。成品自动写入 `minecraft:custom_data.AmmoId`。
 
 缺字段、非法工序或重复配方 ID 会记录 `[CreateTacZrecipe]` 日志并跳过该定义/配方，不会阻止其他口径加载。
@@ -111,8 +116,8 @@
 ## 添加常规口径
 
 默认口径维护入口是 `startup_scripts/createtaczrecipe/01_ammo_catalog.js`，不再修改
-`ammo_standard.js`。新增默认口径需要同时准备固定物品、语言和模具资源；外部 JSON 在本阶段只能覆盖
-catalog 已有 key，不能动态注册新口径。`powderCount`、`sourceBatch` 和 `metalUnits` 是来源经济的记录值；
+`ammo_standard.js`。新增默认口径需要同时准备固定物品、语言和模具资源；外部 JSON 的 `additions`
+可新增 key，并可选择项目命名空间的动态中间物品或引用已安装模组物品。`powderCount`、`sourceBatch` 和 `metalUnits` 是来源经济的记录值；
 实际压铸输入由 `casingMetalUnits` / `bulletMetalUnits` 决定，产量由 `counts` 决定。不要为同一 AmmoId
 再注册第二条定义。
 
@@ -123,8 +128,8 @@ catalog 已有 key，不能动态注册新口径。`powderCount`、`sourceBatch`
 它们仍显示在“机械动力 × TaCZ 配方”专属创造栏中。这样新增口径无需再维护一份 Java 口径数组。
 
 未来特殊弹药可在 `primerRecipe`、`propellantRecipe` 或独立组件配方中使用已确认的
-`create:mixing`、`create:cutting`、`create:sandpaper_polishing` 等类型；序列工序列表目前只允许
-`create:deploying`、`create:pressing`、`create:cutting`，未经当前 Create 版本验证的类型不会被接受。
+`create:mixing`、`create:cutting`、`create:sandpaper_polishing` 等类型；Create 6.0.10 的序列工序列表
+允许 `create:deploying`、`create:pressing`、`create:cutting`、`create:filling`，其他类型会在加载时明确拒绝。
 
 ## 外部视觉资源
 

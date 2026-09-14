@@ -5,7 +5,7 @@
     key: true, ammoId: true,
     casingMetalUnits: true, bulletMetalUnits: true, chargeLevel: true,
     casingMaterial: true, bulletMaterial: true, bulletExtraIngredients: true,
-    casingMold: true, bulletMold: true, counts: true,
+    casingMold: true, bulletMold: true, counts: true, processPreset: true, operations: true,
   };
   const copyValue = (value) => {
     if (Array.isArray(value)) return value.map(copyValue);
@@ -38,6 +38,8 @@
     }
     if (override.ammoId !== undefined && (typeof override.ammoId !== "string" || !resourcePattern.test(override.ammoId))) return fail(file, key, "ammoId", "must be a valid namespace:path resource ID");
     if (override.chargeLevel !== undefined && ["light", "standard", "heavy"].indexOf(override.chargeLevel) < 0) return fail(file, key, "chargeLevel", "must be light, standard, or heavy");
+    if (override.processPreset !== undefined && ["conventional", "shotgun", "custom"].indexOf(override.processPreset) < 0) return fail(file, key, "processPreset", "must be conventional, shotgun, or custom");
+    if (override.processPreset === "custom" && (!Array.isArray(override.operations) || override.operations.length === 0)) return fail(file, key, "operations", "must be a non-empty array when processPreset is custom");
     for (const field of ["casingMold", "bulletMold"]) if (override[field] !== undefined && (typeof override[field] !== "string" || !moldPattern.test(override[field]))) return fail(file, key, field, "must be a valid mold path without a namespace");
     for (const field of ["casingMaterial", "bulletMaterial"]) {
       if (override[field] !== undefined && !validIngredient(override[field])) return fail(file, key, field, "must contain a valid item or tag resource ID");

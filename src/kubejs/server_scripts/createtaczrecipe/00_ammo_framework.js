@@ -1,13 +1,14 @@
 // Data-driven Create/TaCZ ammunition recipe registration.
 (() => {
   // These are the Create operation types supported inside sequenced assembly here.
-  const allowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true };
+  const allowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true, "create:filling": true };
   const componentAllowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true, "create:mixing": true, "create:compacting": true, "create:sandpaper_polishing": true, "createdieselgenerators:compression_molding": true };
   const compressionMoldingInputLimit = 64;
   let seen = {};
   const log = (message) => console.log(`[CreateTacZrecipe] ${message}`);
   const hasText = (value) => typeof value === "string" && value.length > 0;
-  const validIngredient = (value) => value && (hasText(value.item) || hasText(value.tag) || hasText(value.ref));
+  const validFluid = (value) => value && value.type === "neoforge:single" && hasText(value.fluid) && Number.isInteger(value.amount) && value.amount >= 1;
+  const validIngredient = (value) => value && (hasText(value.item) || hasText(value.tag) || hasText(value.ref) || validFluid(value));
   const validResult = (value) => value && (hasText(value.id) || hasText(value.ref));
   const validCount = (value) => value === undefined || (Number.isInteger(value) && value >= 1 && value <= 99);
   const resolveStack = (stack, ammo, result) => {
@@ -50,6 +51,8 @@
     if (!step || !allowed[step.type]) { log(`skipped ${key}: invalid operation type at index ${index}: ${step && step.type}`); return false; }
     if (!Array.isArray(step.ingredients) || step.ingredients.some((item) => !validIngredient(item))) { log(`skipped ${key}: invalid ingredients at operation ${index}`); return false; }
     if (!Array.isArray(step.results) || step.results.some((item) => !validResult(item))) { log(`skipped ${key}: invalid results at operation ${index}`); return false; }
+    if (step.type === "create:filling" && (step.ingredients.length !== 2 || !validFluid(step.ingredients[1]))) { log(`skipped ${key}: filling operation ${index} requires a second neoforge:single fluid ingredient with positive integer amount`); return false; }
+    if (step.keep_held_item !== undefined && typeof step.keep_held_item !== "boolean") { log(`skipped ${key}: keep_held_item at operation ${index} must be boolean`); return false; }
     return true;
   };
   const validateComponent = (recipe, name, key) => {
@@ -90,6 +93,8 @@
     if (!Array.isArray(ammo.materials.bulletExtras) || ammo.materials.bulletExtras.some((ingredient) => !validIngredient(ingredient) || !Number.isInteger(ingredient.amount) || ingredient.amount < 1 || ingredient.amount > 99)) { log(`skipped ${ammo.key}: invalid bulletExtraIngredients`); return false; }
     if (!ammo.counts || !validCount(ammo.counts.casing) || !validCount(ammo.counts.roughBullet) || !validCount(ammo.counts.polishedBullet) || !validCount(ammo.counts.assembly) || !ammo.economy || !validCount(ammo.economy.sourceBatch)) { log(`skipped ${ammo.key}: result counts must be integers in range 1..99`); return false; }
     if (["light", "standard", "heavy"].indexOf(ammo.chargeLevel) < 0) { log(`skipped ${ammo.key}: invalid chargeLevel ${ammo.chargeLevel}`); return false; }
+    if (["conventional", "shotgun", "custom"].indexOf(ammo.processPreset) < 0) { log(`skipped ${ammo.key}: invalid processPreset ${ammo.processPreset}`); return false; }
+    if (ammo.processPreset === "custom" && ammo.operations.length === 0) { log(`skipped ${ammo.key}: custom processPreset requires at least one operation`); return false; }
     if (!validateCompressionMoldingInputs(ammo)) return false;
     if (!validateComponent(ammo.polishing, "polishing", ammo.key) || !validateComponent(ammo.primerRecipe, "primer", ammo.key) || !validateComponent(ammo.propellantRecipe, "propellant", ammo.key)) return false;
     for (let i = 0; i < ammo.operations.length; i++) if (!validateStep(ammo.operations[i], i, ammo.key)) return false;

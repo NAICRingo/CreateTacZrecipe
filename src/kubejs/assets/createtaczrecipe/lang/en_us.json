@@ -129,5 +129,11 @@
   "item.createtaczrecipe.polished_50bmg_bullet": ".50 BMG Polished Projectile",
   "item.createtaczrecipe.incomplete_50bmg_round": ".50 BMG Incomplete Cartridge",
   "mold.kubejs.createtaczrecipe_50bmg_casing": ".50 BMG Casing Mold",
-  "mold.kubejs.createtaczrecipe_50bmg_bullet": ".50 BMG Projectile Mold"
+  "mold.kubejs.createtaczrecipe_50bmg_bullet": ".50 BMG Projectile Mold",
+  "item.createtaczrecipe.empty_12g_casing": "12 Gauge Casing",
+  "item.createtaczrecipe.rough_12g_bullet": "12 Gauge Rough Projectile",
+  "item.createtaczrecipe.polished_12g_bullet": "12 Gauge Polished Projectile",
+  "item.createtaczrecipe.incomplete_12g_round": "12 Gauge Incomplete Shell",
+  "mold.kubejs.createtaczrecipe_12g_casing": "12 Gauge Casing Mold",
+  "mold.kubejs.createtaczrecipe_12g_bullet": "12 Gauge Projectile Mold"
 }

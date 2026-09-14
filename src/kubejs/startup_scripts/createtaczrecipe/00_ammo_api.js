@@ -27,6 +27,22 @@ const standardAmmo = (spec) => {
     polishedBullet: spec.counts && spec.counts.polishedBullet || 1,
     assembly: spec.counts && spec.counts.assembly || 1,
   };
+  const conventionalOperations = [
+    { type: "create:deploying", ingredients: [{ ref: "transitional" }, primerInput], results: [{ ref: "transitional" }] },
+    { type: "create:deploying", ingredients: [{ ref: "transitional" }, propellantInput], results: [{ ref: "transitional" }] },
+    { type: "create:deploying", ingredients: [{ ref: "transitional" }, bulletInput], results: [{ ref: "transitional" }] },
+  ].concat(spec.extraOperations || [], [
+    { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
+  ]);
+  const shotgunOperations = [
+    { type: "create:deploying", ingredients: [{ ref: "transitional" }, primerInput], results: [{ ref: "transitional" }] },
+    { type: "create:deploying", ingredients: [{ ref: "transitional" }, propellantInput], results: [{ ref: "transitional" }] },
+    { type: "create:deploying", ingredients: [{ ref: "transitional" }, bulletInput], results: [{ ref: "transitional" }] },
+    { type: "create:cutting", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
+    { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
+  ];
+  const processPreset = spec.processPreset || "conventional";
+  const operations = processPreset === "custom" ? spec.operations : (processPreset === "shotgun" ? shotgunOperations : conventionalOperations);
   return {
     key: key,
     casingMold: casingMold,
@@ -53,17 +69,12 @@ const standardAmmo = (spec) => {
     transitional: transitional,
     final: spec.final || "tacz:ammo",
     ammoId: spec.ammoId || `tacz:${key}`,
+    processPreset: processPreset,
     polishing: spec.polishing || { type: "create:sandpaper_polishing", input: { ref: "roughBullet" }, output: { ref: "polishedBullet", count: counts.polishedBullet } },
     // Primers use the shared recipe unless a caliber explicitly opts into an override.
     primerRecipe: spec.primerRecipe || null,
     propellantRecipe: spec.propellantRecipe || null,
-    operations: spec.operations || [
-      { type: "create:deploying", ingredients: [{ ref: "transitional" }, primerInput], results: [{ ref: "transitional" }] },
-      { type: "create:deploying", ingredients: [{ ref: "transitional" }, propellantInput], results: [{ ref: "transitional" }] },
-      { type: "create:deploying", ingredients: [{ ref: "transitional" }, bulletInput], results: [{ ref: "transitional" }] },
-    ].concat(spec.extraOperations || [], [
-      { type: "create:pressing", ingredients: [{ ref: "transitional" }], results: [{ ref: "transitional" }] },
-    ]),
+    operations: operations,
   };
 };
 

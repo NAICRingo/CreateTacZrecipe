@@ -129,5 +129,11 @@
   "item.createtaczrecipe.polished_50bmg_bullet": ".50 BMG 狙击弹 抛光弹头",
   "item.createtaczrecipe.incomplete_50bmg_round": ".50 BMG 狙击弹 未完成弹药",
   "mold.kubejs.createtaczrecipe_50bmg_casing": ".50 BMG 狙击弹 弹壳模具",
-  "mold.kubejs.createtaczrecipe_50bmg_bullet": ".50 BMG 狙击弹 弹头模具"
+  "mold.kubejs.createtaczrecipe_50bmg_bullet": ".50 BMG 狙击弹 弹头模具",
+  "item.createtaczrecipe.empty_12g_casing": "12号霰弹 弹壳",
+  "item.createtaczrecipe.rough_12g_bullet": "12号霰弹 粗制弹丸",
+  "item.createtaczrecipe.polished_12g_bullet": "12号霰弹 抛光弹丸",
+  "item.createtaczrecipe.incomplete_12g_round": "12号霰弹 未完成弹药",
+  "mold.kubejs.createtaczrecipe_12g_casing": "12号霰弹 弹壳模具",
+  "mold.kubejs.createtaczrecipe_12g_bullet": "12号霰弹 弹丸模具"
 }
