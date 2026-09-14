@@ -32,7 +32,7 @@
     const definition = api.standardAmmo({
       key: profile.key, ammoId: profile.ammoId, displayName: profile.displayName,
       casing: casing, roughBullet: rough, polishedBullet: polished, transitional: transitional,
-      casingMold: `createtaczrecipe_${profile.key}_casing`, bulletMold: `createtaczrecipe_${profile.key}_bullet`,
+      casingMold: "createtaczrecipe_external_casing", bulletMold: "createtaczrecipe_external_bullet",
       chargeLevel: profile.chargeLevel, metalUnits: profile.metalUnits, sourceBatch: profile.sourceBatch,
       powderCount: profile.powderCount, dynamic: true
     });
