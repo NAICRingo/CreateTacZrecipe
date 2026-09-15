@@ -4,6 +4,7 @@ const vm = require("vm");
 
 const root = path.resolve(__dirname, "..");
 const recipes = [];
+const withoutOptional = process.env.NO_OPTIONAL === "1";
 const tags = new Map();
 let recipeCallback;
 let tagCallback;
@@ -12,8 +13,8 @@ const context = vm.createContext({
   console: console,
   global: {},
   JsonIO: { read: () => null },
-  Item: { of: () => ({ isEmpty: () => false }) },
-  CDGEvents: { molds: () => {} },
+  Item: { of: (id) => ({ isEmpty: () => withoutOptional && /^createdeco:/.test(id) }) },
+  CDGEvents: withoutOptional ? undefined : { molds: () => {} },
   ServerEvents: {
     recipes: (callback) => { recipeCallback = callback; },
     tags: (type, callback) => { if (type === "item") tagCallback = callback; },
@@ -46,7 +47,7 @@ recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recip
 
 const definitions = context.global.createtaczrecipe.definitions;
 check(definitions.length === 30, `expected 30 definitions (22 core + 8 gunpack), got ${definitions.length}`);
-check(recipes.length === 185, `expected 185 recipes (30 x 6 + 5 common), got ${recipes.length}`);
+check(recipes.length === (withoutOptional ? 125 : 185), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
 check(new Set(definitions.map((definition) => definition.ammoId)).size === 30, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
