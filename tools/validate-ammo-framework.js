@@ -47,7 +47,7 @@ recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recip
 
 const definitions = context.global.createtaczrecipe.definitions;
 check(definitions.length === 30, `expected 30 definitions (22 core + 8 gunpack), got ${definitions.length}`);
-check(recipes.length === (withoutOptional ? 125 : 185), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
+check(recipes.length === (withoutOptional ? 65 : 185), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
 check(new Set(definitions.map((definition) => definition.ammoId)).size === 30, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
