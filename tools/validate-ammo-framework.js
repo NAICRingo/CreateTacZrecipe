@@ -133,7 +133,7 @@ check(bullet12g.ingredients.filter((ingredient) => ingredient.tag === "c:nuggets
 for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_58x21", "cib_65x50", "cib_8x22", "cib_9x39mm"]) {
   const definition = definitions.find((value) => value.key === key);
   check(definition && definition.dynamic && definition.gunpack, `${key} gunpack definition missing`);
-  check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === 6, `${key} must register six gunpack recipes`);
+  check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === (withoutOptional ? 2 : 6), `${key} must register ${withoutOptional ? 2 : 6} gunpack recipes`);
 }
 
 console.log(`CreateTacZrecipe static validation passed: ${definitions.length} definitions, ${recipes.length} recipes, ${tags.size} item tags.`);
