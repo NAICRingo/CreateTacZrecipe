@@ -12,7 +12,7 @@ Versions observed in `Mechanomania11120` on 2026-09-11:
 | KubeJS | `kubejs-neoforge-2101.7.2-build.368.jar` |
 | LootJS | `lootjs-neoforge-1.21.1-3.7.0.jar` |
 | Create Deco (optional material mapping) | `createdeco-2.1.3.jar` |
-| Create Diesel Generators (optional mold compatibility) | `createdieselgenerators-*.jar` |
+| Create Diesel Generators (required for casing/projectile molding) | `createdieselgenerators-*.jar` |
 | Create Prism | `createprism-1.2.2.jar` |
 | Iris compile/runtime compatibility | `iris-neoforge-1.8.14-beta.1+mc1.21.1.jar` |
 | Sodium compile/runtime compatibility | `sodium-neoforge-0.8.13+mc1.21.1.jar` |

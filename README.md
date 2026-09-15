@@ -36,12 +36,13 @@ For adding another gunpack without rewriting the processing chain, use
 `docs/GUNPACK-RECIPE-INTERFACE.md` and `docs/GUNPACK-RECIPE-TEMPLATE.js`.
 
 Runtime dependencies are Minecraft 1.21.1, NeoForge 21.1.248, Create 6.0.10,
-KubeJS 2101.7.2 and TaCZ 1.1.8. Create Diesel Generators is optional: when it is
-installed, the module registers its native compression-molding and mold recipes;
-without it those compatibility recipes are skipped without preventing the core
-module and other scripts from loading. Create Deco is also optional. Its brass and
-copper coin items are added to the material tags only when present; pack authors may
-provide equivalent tagged materials from another mod.
+KubeJS 2101.7.2, TaCZ 1.1.8 and Create Diesel Generators 1.3.15. CDG supplies the
+actual mold item and `compression_molding` recipe type used by the casing and
+projectile stages, so the complete production flow cannot run without it. The
+scripts still guard its API and log skipped compatibility content if a broken or
+partial installation is encountered. Create Deco is optional: its coin items are
+used when present, otherwise the material tags fall back to standard
+`c:ingots/brass` and `c:ingots/copper` tags.
 
 The current isolated test profile also includes the separate
 `02_gunpack_catalog.js` source. It adds only the clearly conventional ammunition

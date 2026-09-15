@@ -13,7 +13,7 @@ const context = vm.createContext({
   global: {},
   JsonIO: { read: () => null },
   Item: { of: () => ({ isEmpty: () => false }) },
-  CDGEvents: {},
+  CDGEvents: { molds: () => {} },
   ServerEvents: {
     recipes: (callback) => { recipeCallback = callback; },
     tags: (type, callback) => { if (type === "item") tagCallback = callback; },

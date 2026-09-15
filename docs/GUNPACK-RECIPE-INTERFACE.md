@@ -151,7 +151,7 @@
   `visuals.transitional` 可以填写标准纹理资源位置，如 `your_pack:item/ammo/empty_12g_casing`。
 - 未填写 `visuals` 时，四种项目自有中间物品分别使用内置弹壳、粗弹头、抛光弹头和未完成弹药备用贴图。
 - CDG 1.3.15 的 `CDGEvents.molds.create` 不接受贴图参数。省略 `molds` 或填写
-  `createtaczrecipe_external_casing` / `createtaczrecipe_external_bullet` 时使用本项目内置的两种通用模具外观。
+`createtaczrecipe_external_casing` / `createtaczrecipe_external_bullet` 时使用本项目内置的两种通用模具外观。CDG 是核心成型流程的必要前置；缺少 CDG 时脚本会跳过模具和压铸兼容配方并记录日志，不能完成弹壳/弹头生产。
 - 独立模具类型仍受支持；其模型路径为 `assets/kubejs/models/item/mold/<type>.json`，纹理路径通常为
   `assets/kubejs/textures/item/mold/<type>.png`，由枪包资源包提供。资源缺失只影响显示，不影响配方注册。
 
