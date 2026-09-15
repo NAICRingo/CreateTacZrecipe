@@ -35,6 +35,14 @@ for unresolved design decisions.
 For adding another gunpack without rewriting the processing chain, use
 `docs/GUNPACK-RECIPE-INTERFACE.md` and `docs/GUNPACK-RECIPE-TEMPLATE.js`.
 
+Runtime dependencies are Minecraft 1.21.1, NeoForge 21.1.248, Create 6.0.10,
+KubeJS 2101.7.2 and TaCZ 1.1.8. Create Diesel Generators is optional: when it is
+installed, the module registers its native compression-molding and mold recipes;
+without it those compatibility recipes are skipped without preventing the core
+module and other scripts from loading. Create Deco is also optional. Its brass and
+copper coin items are added to the material tags only when present; pack authors may
+provide equivalent tagged materials from another mod.
+
 The current isolated test profile also includes the separate
 `02_gunpack_catalog.js` source. It adds only the clearly conventional ammunition
 found in the enabled CIBR and Gunpowder Revolution packs; explosive, incendiary,

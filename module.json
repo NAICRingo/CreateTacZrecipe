@@ -5,8 +5,6 @@
   "requiredMods": [
     "kubejs",
     "create",
-    "createdeco",
-    "createdieselgenerators",
     "tacz"
   ],
   "testedInstance": "Mechanomania11120-CreateTacZrecipe-Test"

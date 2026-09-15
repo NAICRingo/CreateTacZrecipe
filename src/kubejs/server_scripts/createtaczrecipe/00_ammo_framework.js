@@ -4,6 +4,7 @@
   const allowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true, "create:filling": true };
   const componentAllowed = { "create:deploying": true, "create:pressing": true, "create:cutting": true, "create:mixing": true, "create:compacting": true, "create:sandpaper_polishing": true, "createdieselgenerators:compression_molding": true };
   const compressionMoldingInputLimit = 64;
+  const hasDieselGenerators = typeof CDGEvents !== "undefined";
   let seen = {};
   const log = (message) => console.log(`[CreateTacZrecipe] ${message}`);
   const hasText = (value) => typeof value === "string" && value.length > 0;
@@ -113,13 +114,19 @@
       if (!validate(ammo)) return;
       const base = `ammo/${ammo.key}`;
       let registered = 0;
-      if (emit(event, `molds/${ammo.key}_casing`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.casing, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.casingMold}` } } })) registered++;
-      if (emit(event, `molds/${ammo.key}_bullet`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.bullet, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.bulletMold}` } } })) registered++;
+      if (hasDieselGenerators) {
+        if (emit(event, `molds/${ammo.key}_casing`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.casing, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.casingMold}` } } })) registered++;
+        if (emit(event, `molds/${ammo.key}_bullet`, { type: "minecraft:crafting_shapeless", ingredients: ammo.moldMaterials.bullet, result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": `kubejs:${ammo.bulletMold}` } } })) registered++;
+      } else {
+        log(`skipped ${ammo.key}: Create Diesel Generators is not loaded; mold recipes are unavailable`);
+      }
       const casingIngredients = repeatIngredient(ammo.materials.casing, ammo.economy.casingMetalUnits);
       const bulletIngredients = repeatIngredient(ammo.materials.bullet, ammo.economy.bulletMetalUnits);
       ammo.materials.bulletExtras.forEach((ingredient) => repeatIngredient(ingredient, ingredient.amount).forEach((copy) => bulletIngredients.push(copy)));
-      if (emit(event, `components/${ammo.key}_casing`, { type: "createdieselgenerators:compression_molding", ingredients: casingIngredients, mold: `kubejs:${ammo.casingMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.casing || ammo.casing, count: ammo.counts && ammo.counts.casing || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
-      if (emit(event, `components/${ammo.key}_rough_bullet`, { type: "createdieselgenerators:compression_molding", ingredients: bulletIngredients, mold: `kubejs:${ammo.bulletMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.roughBullet || ammo.roughBullet, count: ammo.counts && ammo.counts.roughBullet || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
+      if (hasDieselGenerators) {
+        if (emit(event, `components/${ammo.key}_casing`, { type: "createdieselgenerators:compression_molding", ingredients: casingIngredients, mold: `kubejs:${ammo.casingMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.casing || ammo.casing, count: ammo.counts && ammo.counts.casing || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
+        if (emit(event, `components/${ammo.key}_rough_bullet`, { type: "createdieselgenerators:compression_molding", ingredients: bulletIngredients, mold: `kubejs:${ammo.bulletMold}`, results: [{ id: ammo.outputItem && ammo.outputItem.roughBullet || ammo.roughBullet, count: ammo.counts && ammo.counts.roughBullet || ammo.economy && ammo.economy.sourceBatch || 1 }] })) registered++;
+      }
       if (ammo.polishing && emit(event, `components/${ammo.key}_polishing`, { type: ammo.polishing.type, ingredients: [resolveStack(ammo.polishing.input, ammo, false)], results: [resolveStack(ammo.polishing.output, ammo, true)] })) registered++;
       if (ammo.primerRecipe && emit(event, `components/${ammo.key}_primer`, resolveRecipe(ammo.primerRecipe, ammo))) registered++;
       if (ammo.propellantRecipe && emit(event, `components/${ammo.key}_propellant`, resolveRecipe(ammo.propellantRecipe, ammo))) registered++;
