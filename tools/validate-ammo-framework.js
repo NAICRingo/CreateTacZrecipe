@@ -108,6 +108,7 @@ check(definitions.find((value) => value.key === "9mm").economy.chargeCapacity ==
 check(definitions.find((value) => value.key === "308").economy.chargeCapacity === 60, ".308 charge capacity mismatch");
 check(definitions.find((value) => value.key === "50bmg").economy.chargeCapacity === 24, ".50 BMG charge capacity mismatch");
 
+if (!withoutOptional) {
 const bullet308 = recipes.find((entry) => entry.id === "createtaczrecipe:components/308_rough_bullet").recipe;
 const bullet50 = recipes.find((entry) => entry.id === "createtaczrecipe:components/50bmg_rough_bullet").recipe;
 const casing50 = recipes.find((entry) => entry.id === "createtaczrecipe:components/50bmg_casing").recipe;
@@ -127,6 +128,7 @@ const bullet12g = recipes.find((entry) => entry.id === "createtaczrecipe:compone
 check(casing12g.ingredients.length === 9 && casing12g.results[0].count === 18, "12G casing balance mismatch");
 check(bullet12g.ingredients.length === 24 && bullet12g.results[0].count === 18, "12G projectile balance mismatch");
 check(bullet12g.ingredients.filter((ingredient) => ingredient.tag === "c:nuggets/iron").length === 18, "12G iron input mismatch");
+}
 
 for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_58x21", "cib_65x50", "cib_8x22", "cib_9x39mm"]) {
   const definition = definitions.find((value) => value.key === key);
