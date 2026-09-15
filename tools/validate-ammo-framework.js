@@ -53,7 +53,8 @@ check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplic
 
 for (const definition of definitions) {
   const key = definition.key;
-  check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === 6, `${key} must register exactly six caliber-specific recipes`);
+  const expectedPerCaliber = withoutOptional ? 2 : 6;
+  check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === expectedPerCaliber, `${key} must register exactly ${expectedPerCaliber} caliber-specific recipes`);
   for (const tag of [`createtaczrecipe:casings/empty/${key}`, `createtaczrecipe:projectiles/rough/${key}`, `createtaczrecipe:projectiles/polished/${key}`, `createtaczrecipe:cartridges/incomplete/${key}`]) {
     const values = tags.get(tag) || [];
     check(values.length === 1, `${tag} must contain exactly one default item`);
