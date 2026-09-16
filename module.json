@@ -1,6 +1,6 @@
 {
-  "id": "createtaczrecipe-ammo-prototype",
-  "version": "0.1.0",
+  "id": "createtaczrecipe",
+  "version": "0.2.0-rc1",
   "minecraft": "1.21.1",
   "requiredMods": [
     "kubejs",

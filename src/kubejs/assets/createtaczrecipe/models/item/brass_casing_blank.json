@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "createtaczrecipe:item/brass_casing_blank"
+  }
+}

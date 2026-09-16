@@ -60,9 +60,15 @@ public final class CreateTacZrecipe {
         List<String> calibers = discoverCalibers();
         addMold(output, "createtaczrecipe_metal_blank");
         for (String caliber : calibers) {
-            addMold(output, "createtaczrecipe_" + caliber + "_casing");
-            addMold(output, "createtaczrecipe_" + caliber + "_bullet");
+            // Built-in calibers have their own charge item and dedicated molds.
+            // Gun-pack adapters deliberately share the two external mold types.
+            if (!itemStack("createtaczrecipe:" + caliber + "_propellant_charge").isEmpty()) {
+                addMold(output, "createtaczrecipe_" + caliber + "_casing");
+                addMold(output, "createtaczrecipe_" + caliber + "_bullet");
+            }
         }
+        addMold(output, "createtaczrecipe_external_casing");
+        addMold(output, "createtaczrecipe_external_bullet");
         for (String caliber : calibers) {
             addItem(output, "createtaczrecipe:" + caliber + "_propellant_charge");
             addItem(output, "createtaczrecipe:empty_" + caliber + "_casing");

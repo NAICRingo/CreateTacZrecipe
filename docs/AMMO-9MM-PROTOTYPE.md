@@ -7,42 +7,45 @@
 - Project namespace: `createtaczrecipe`
 - Tested on: 2026-09-11
 
-The source instance is not a deployment target. `tools/Deploy-KubeJsModule.ps1`
-defaults to the isolated instance and copies only files owned by this module.
+The source instance is not a deployment target. Release builds embed the project's
+KubeJS scripts and resources in the mod JAR. `tools/Deploy-KubeJsModule.ps1` is a
+development-only helper for testing unbundled script changes.
 
 ## Production chain
 
-Two reusable Create Diesel Generators molds are introduced:
+The current release uses a reusable Create Diesel Generators metal-blank mold,
+followed by caliber-specific casing and projectile molds:
 
-- 9mm casing mold: iron plate plus Create Deco brass coin.
-- 9mm bullet mold: iron plate plus Create Deco copper coin.
+- Eight `#c:nuggets/brass` plus the common mold produce one brass casing blank.
+- Eight `#c:nuggets/copper` plus the common mold produce one copper projectile blank.
+- The 9mm molds convert those blanks into the caliber-specific intermediates.
 
 The consumable chain is:
 
-1. Compression-mold one brass blank into one empty casing.
-2. Compression-mold one copper blank into two rough bullets.
+1. Compression-mold the 9mm batch of brass blanks into empty casings.
+2. Compression-mold the 9mm batch of copper blanks into rough projectiles.
 3. Polish each rough bullet with sandpaper.
-4. Press one iron nugget into ten small-arms primers.
-5. Mix one gunpowder into 25 light propellant charges.
+4. Produce primer compound and small-arms primers through the shared primer chain.
+5. Produce the caliber-specific 9mm measured propellant charge.
 6. Run the empty casing through three deployers and one press: primer, propellant,
    polished bullet, then final crimping.
 7. Output one `tacz:ammo` carrying `AmmoId: tacz:9mm`.
 
-The current metal-blank tags point to Create Deco coins. They are deliberately
-abstracted behind `createtaczrecipe:metal_blanks/*`, so a later pack update can replace the
-coin input with another blank or stamped part without rewriting every recipe.
-`ultramarine:copper_cash_coin` is not used because it is active merchant currency.
+Create Deco is not used by the current recipe economy and is not a dependency.
+Raw metal enters through the common brass/copper nugget tags. Caliber-specific
+intermediate tags remain available for compatibility without allowing calibers to
+consume one another's casings or projectiles.
 
 ## Initial balance
 
-For 50 completed rounds, the production line consumes:
+The current 50-round 9mm batch preserves the TaCZ source recipe as its economic
+baseline while applying the documented automation discount:
 
 | Material | Amount |
 | --- | ---: |
-| Brass coin / nugget blank | 50 |
-| Copper coin / nugget blank | 25 |
-| Iron nugget | 5 |
-| Gunpowder | 2 |
+| Brass casing blank | 5 |
+| Copper projectile blank | 5 |
+| Primer + measured-charge gunpowder equivalent | See generated catalog data |
 
 The intermediates solve Create's one-item-per-deployer-step behavior while still
 allowing primer and propellant recipes to produce practical batches. The original
@@ -68,7 +71,8 @@ gameplay test must still confirm:
 ## Updating Mechanomania
 
 1. Clone the updated instance before testing.
-2. Run `tools/Deploy-KubeJsModule.ps1 -InstancePath <cloned-instance-path>`.
+2. Put the release JAR in the cloned instance's `mods` directory. For development
+   only, `tools/Deploy-KubeJsModule.ps1` may deploy unbundled scripts instead.
 3. Let the dependency checks stop deployment if a relevant mod version no longer matches.
 4. Test startup, recipe reload and a copied world before changing the main instance.
 5. Update tags or individual adapters when item IDs change; keep recipe IDs and the

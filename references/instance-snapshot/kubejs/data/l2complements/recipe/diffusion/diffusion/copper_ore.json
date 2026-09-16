@@ -1,6 +1,0 @@
-{
-  "type": "l2complements:diffusion",
-  "base": "minecraft:stone",
-  "ingredient": "minecraft:copper_block",
-  "result": "minecraft:copper_ore"
-}

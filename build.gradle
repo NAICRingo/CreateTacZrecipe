@@ -14,10 +14,18 @@ base {
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
+    maven { url = 'https://maven.latvian.dev/releases' }
 }
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
+    compileOnly "dev.latvian.mods:kubejs-neoforge:2101.7.2-build.368"
+}
+
+tasks.named('processResources', ProcessResources).configure {
+    from('src/kubejs/assets') { into 'assets' }
+    from('src/kubejs/startup_scripts/createtaczrecipe') { into 'kubejs_scripts/startup_scripts/createtaczrecipe' }
+    from('src/kubejs/server_scripts/createtaczrecipe') { into 'kubejs_scripts/server_scripts/createtaczrecipe' }
 }
 
 runs {

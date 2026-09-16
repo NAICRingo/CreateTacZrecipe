@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "createtaczrecipe:item/propellant_charge/308"
+  }
+}

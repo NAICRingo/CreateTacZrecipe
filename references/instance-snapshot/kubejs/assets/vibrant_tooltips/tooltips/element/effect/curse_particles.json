@@ -1,8 +1,0 @@
-{
-  "type": "obscure_tooltips:inward_particle",
-  "particle": {
-    "type": "obscure_tooltips:line",
-    "center_color": "#80FF2080",
-    "edge_color": "#00AA2040"
-  }
-}

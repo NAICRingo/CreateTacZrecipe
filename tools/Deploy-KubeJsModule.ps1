@@ -20,7 +20,6 @@ if (-not (Test-Path -LiteralPath $modsPath -PathType Container)) {
 $requiredJarPatterns = @(
     "kubejs-neoforge-*.jar",
     "create-1.21.1-6*.jar",
-    "createdeco-*.jar",
     "createdieselgenerators-*.jar",
     "tacz-neoforge-1.21.1-1.1.8*.jar"
 )

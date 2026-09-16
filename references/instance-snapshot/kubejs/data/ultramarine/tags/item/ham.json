@@ -1,9 +1,0 @@
-{
-  "replace": true,
-  "values": [
-    {
-      "id": "farmersdelight:ham",
-      "required": false
-    }
-  ]
-}

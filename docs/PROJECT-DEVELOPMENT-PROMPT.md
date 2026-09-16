@@ -19,7 +19,7 @@ Arcana 的 NeoForge 移植属于同级目录下的独立项目 `ArcanaNeoForge`�
 - 当前 KubeJS 命名空间为 `createtaczrecipe`；
 - 当前接口文档：`docs/GUNPACK-RECIPE-INTERFACE.md`；
 - 当前总体方案：`docs/DEVELOPMENT-SPEC.md`；
-- 部署工具：`tools/Deploy-KubeJsModule.ps1`。
+- 发布版将脚本和资源内置在 JAR 中；`tools/Deploy-KubeJsModule.ps1` 仅用于开发期测试未打包脚本。
 
 ## 开发原则
 
