@@ -13,9 +13,9 @@ const standardAmmo = (spec) => {
   const bulletMold = spec.bulletMold || `createtaczrecipe_${key}_bullet`;
   const primer = spec.primer || "createtaczrecipe:small_arms_primer";
   const chargeLevel = spec.chargeLevel || "standard";
-  const propellant = spec.propellant || `createtaczrecipe:${chargeLevel}_propellant_charge`;
+  const propellant = spec.propellant || spec.caliberCharge || `createtaczrecipe:${chargeLevel}_propellant_charge`;
   const primerInput = spec.inputIngredient && spec.inputIngredient.primer ? spec.inputIngredient.primer : { tag: "createtaczrecipe:materials/primers" };
-  const propellantInput = spec.inputIngredient && spec.inputIngredient.propellant ? spec.inputIngredient.propellant : { tag: `createtaczrecipe:propellants/${chargeLevel}` };
+  const propellantInput = spec.inputIngredient && spec.inputIngredient.propellant ? spec.inputIngredient.propellant : (spec.caliberCharge ? { item: spec.caliberCharge } : { tag: `createtaczrecipe:propellants/${chargeLevel}` });
   const sourceBatch = spec.sourceBatch || 50;
   const metalUnits = spec.metalUnits || 10;
   const casingMetalUnits = spec.casingMetalUnits || Math.max(1, Math.ceil(metalUnits / 2));
@@ -43,6 +43,8 @@ const standardAmmo = (spec) => {
   ];
   const processPreset = spec.processPreset || "conventional";
   const operations = processPreset === "custom" ? spec.operations : (processPreset === "shotgun" ? shotgunOperations : conventionalOperations);
+  const chargeIngredients = [];
+  if (spec.caliberCharge) for (let i = 0; i < spec.chargeLooseUnits; i++) chargeIngredients.push({ tag: "createtaczrecipe:propellants/loose" });
   return {
     key: key,
     casingMold: casingMold,
@@ -73,7 +75,7 @@ const standardAmmo = (spec) => {
     polishing: spec.polishing || { type: "create:sandpaper_polishing", input: { ref: "roughBullet" }, output: { ref: "polishedBullet", count: counts.polishedBullet } },
     // Primers use the shared recipe unless a caliber explicitly opts into an override.
     primerRecipe: spec.primerRecipe || null,
-    propellantRecipe: spec.propellantRecipe || null,
+    propellantRecipe: spec.propellantRecipe || (spec.caliberCharge ? { type: "create:compacting", ingredients: chargeIngredients, results: [{ id: spec.caliberCharge, count: spec.chargeOutputCount || 1 }] } : null),
     operations: operations,
   };
 };

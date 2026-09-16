@@ -1,12 +1,12 @@
 ServerEvents.tags("item", (event) => {
   const keys = global.createtaczrecipe.defaultCaliberKeys;
-  const hasItem = (id) => { try { return !Item.of(id).isEmpty(); } catch (error) { return false; } };
-  if (hasItem("createdeco:brass_coin")) event.add("createtaczrecipe:materials/brass_blanks", "createdeco:brass_coin");
-  else event.add("createtaczrecipe:materials/brass_blanks", "#c:ingots/brass");
-  if (hasItem("createdeco:copper_coin")) event.add("createtaczrecipe:materials/copper_blanks", "createdeco:copper_coin");
-  else event.add("createtaczrecipe:materials/copper_blanks", "#c:ingots/copper");
+  event.add("createtaczrecipe:materials/brass_blanks", "#c:nuggets/brass");
+  event.add("createtaczrecipe:materials/copper_blanks", "#c:nuggets/copper");
+  event.add("createtaczrecipe:materials/brass_casing_blanks", "createtaczrecipe:brass_casing_blank");
+  event.add("createtaczrecipe:materials/copper_projectile_blanks", "createtaczrecipe:copper_projectile_blank");
   event.add("createtaczrecipe:materials/iron_plates", "#c:plates/iron");
   event.add("createtaczrecipe:materials/primers", "createtaczrecipe:small_arms_primer");
+  event.add("createtaczrecipe:materials/primer_compounds", "createtaczrecipe:primer_compound");
   event.add("createtaczrecipe:materials/propellants", "minecraft:gunpowder");
   event.add("createtaczrecipe:propellants/loose", "createtaczrecipe:loose_propellant");
   event.add("createtaczrecipe:propellants/light", "createtaczrecipe:light_propellant_charge");

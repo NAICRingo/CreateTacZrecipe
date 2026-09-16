@@ -15,15 +15,25 @@
     ["68x51fury", 5, 40, 15, "standard"], ["762x39", 3, 35, 15, "standard"], ["30_06", 6, 32, 20, "standard"],
     ["308", 10, 60, 30, "standard"], ["338", 8, 18, 25, "standard"], ["45_70", 7, 36, 30, "standard"],
     ["762x54", 8, 60, 25, "standard"], ["792x57", 6, 48, 20, "standard"], ["50bmg", 20, 24, 110, "heavy"],
-    ["12g", 6, 18, 33, "standard"],
+    ["12g", 6, 18, 15, "standard"],
   ];
   const lapisByKey = { "57x28": 5, "500mag": 5, "50ae": 5, "308": 1, "338": 4, "45_70": 5, "50bmg": 12 };
+  const chargeBatch = (powder, rounds) => {
+    const target = 0.95 * powder * 24 / rounds - 0.125;
+    let best = { input: 1, output: 1, error: 999 };
+    for (let input = 1; input <= 64; input++) for (let output = 1; output <= 99; output++) {
+      const error = Math.abs(input / output - target);
+      if (error < best.error) best = { input: input, output: output, error: error };
+    }
+    return best;
+  };
   const catalog = rows.map((row) => {
     const key = row[0];
     const sourceBatch = row[2];
     const extras = lapisByKey[key] ? [{ item: "minecraft:lapis_lazuli", amount: lapisByKey[key] }] : [];
     if (key === "50bmg") extras.push({ item: "minecraft:blaze_rod", amount: 1 });
     if (key === "12g") extras.push({ tag: "c:nuggets/iron", amount: 18 });
+    const charge = chargeBatch(row[1], sourceBatch);
     return {
       key: key,
       displayName: names[key],
@@ -35,8 +45,11 @@
       bulletMetalUnits: key === "50bmg" ? 50 : (key === "12g" ? 6 : Math.max(1, row[3] - Math.ceil(row[3] / 2))),
       chargeLevel: row[4],
       processPreset: key === "12g" ? "shotgun" : "conventional",
-      casingMaterial: { tag: "createtaczrecipe:materials/brass_blanks" },
-      bulletMaterial: { tag: "createtaczrecipe:materials/copper_blanks" },
+      casingMaterial: { tag: "createtaczrecipe:materials/brass_casing_blanks" },
+      bulletMaterial: { tag: "createtaczrecipe:materials/copper_projectile_blanks" },
+      caliberCharge: `createtaczrecipe:${key}_propellant_charge`,
+      chargeLooseUnits: charge.input,
+      chargeOutputCount: charge.output,
       bulletExtraIngredients: extras,
       casingMold: `createtaczrecipe_${key}_casing`,
       bulletMold: `createtaczrecipe_${key}_bullet`,

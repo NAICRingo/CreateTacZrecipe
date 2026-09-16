@@ -50,16 +50,21 @@ public final class CreateTacZrecipe {
 
     private static void addCreativeItems(CreativeModeTab.Output output) {
         addItem(output, "createtaczrecipe:small_arms_primer");
+        addItem(output, "createtaczrecipe:primer_compound");
         addItem(output, "createtaczrecipe:loose_propellant");
+        addItem(output, "createtaczrecipe:brass_casing_blank");
+        addItem(output, "createtaczrecipe:copper_projectile_blank");
         addItem(output, "createtaczrecipe:light_propellant_charge");
         addItem(output, "createtaczrecipe:standard_propellant_charge");
         addItem(output, "createtaczrecipe:heavy_propellant_charge");
         List<String> calibers = discoverCalibers();
+        addMold(output, "createtaczrecipe_metal_blank");
         for (String caliber : calibers) {
             addMold(output, "createtaczrecipe_" + caliber + "_casing");
             addMold(output, "createtaczrecipe_" + caliber + "_bullet");
         }
         for (String caliber : calibers) {
+            addItem(output, "createtaczrecipe:" + caliber + "_propellant_charge");
             addItem(output, "createtaczrecipe:empty_" + caliber + "_casing");
             addItem(output, "createtaczrecipe:rough_" + caliber + "_bullet");
             addItem(output, "createtaczrecipe:polished_" + caliber + "_bullet");

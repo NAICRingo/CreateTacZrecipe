@@ -40,9 +40,12 @@ KubeJS 2101.7.2, TaCZ 1.1.8 and Create Diesel Generators 1.3.15. CDG supplies th
 actual mold item and `compression_molding` recipe type used by the casing and
 projectile stages, so the complete production flow cannot run without it. The
 scripts still guard its API and log skipped compatibility content if a broken or
-partial installation is encountered. Create Deco is optional: its coin items are
-used when present, otherwise the material tags fall back to standard
-`c:ingots/brass` and `c:ingots/copper` tags.
+partial installation is encountered. Create Deco is optional and no longer changes
+default recipe costs. Default metal blanks use `c:nuggets/brass` and
+`c:nuggets/copper`: eight nuggets plus the reusable CDG metal-blank mold produce
+one project-owned blank. Primers and caliber-specific charges share the original
+TaCZ powder budget; legacy light/standard/heavy charge IDs remain registered for
+save and gunpack compatibility.
 
 The current isolated test profile also includes the separate
 `02_gunpack_catalog.js` source. It adds only the clearly conventional ammunition

@@ -105,10 +105,16 @@
     seen = {};
     let commonRegistered = 0;
     if (emit(event, "components/loose_propellant", { type: "create:mixing", ingredients: [{ tag: "createtaczrecipe:materials/propellants" }], results: [{ id: "createtaczrecipe:loose_propellant", count: 24 }] })) commonRegistered++;
+    if (emit(event, "components/primer_compound", { type: "create:mixing", ingredients: [{ tag: "createtaczrecipe:propellants/loose" }], results: [{ id: "createtaczrecipe:primer_compound", count: 8 }] })) commonRegistered++;
     if (emit(event, "components/light_propellant", { type: "create:pressing", ingredients: [{ tag: "createtaczrecipe:propellants/loose" }], results: [{ id: "createtaczrecipe:light_propellant_charge" }] })) commonRegistered++;
     if (emit(event, "components/standard_propellant", { type: "create:compacting", ingredients: repeatIngredient({ tag: "createtaczrecipe:propellants/loose" }, 4), results: [{ id: "createtaczrecipe:standard_propellant_charge" }] })) commonRegistered++;
     if (emit(event, "components/heavy_propellant", { type: "create:compacting", heat_requirement: "heated", ingredients: repeatIngredient({ tag: "createtaczrecipe:propellants/standard" }, 5), results: [{ id: "createtaczrecipe:heavy_propellant_charge" }] })) commonRegistered++;
-    if (emit(event, "components/small_arms_primer", { type: "create:pressing", ingredients: [{ tag: "createtaczrecipe:materials/iron_plates" }], results: [{ id: "createtaczrecipe:small_arms_primer", count: 10 }] })) commonRegistered++;
+    if (emit(event, "components/small_arms_primer", { type: "create:pressing", ingredients: [{ tag: "createtaczrecipe:materials/primer_compounds" }], results: [{ id: "createtaczrecipe:small_arms_primer" }] })) commonRegistered++;
+    if (hasDieselGenerators) {
+      if (emit(event, "molds/metal_blank", { type: "minecraft:crafting_shapeless", ingredients: [{ tag: "createtaczrecipe:materials/iron_plates" }], result: { id: "createdieselgenerators:mold", components: { "createdieselgenerators:mold_type": "kubejs:createtaczrecipe_metal_blank" } } })) commonRegistered++;
+      if (emit(event, "components/brass_casing_blank", { type: "createdieselgenerators:compression_molding", ingredients: repeatIngredient({ tag: "c:nuggets/brass" }, 8), mold: "kubejs:createtaczrecipe_metal_blank", results: [{ id: "createtaczrecipe:brass_casing_blank" }] })) commonRegistered++;
+      if (emit(event, "components/copper_projectile_blank", { type: "createdieselgenerators:compression_molding", ingredients: repeatIngredient({ tag: "c:nuggets/copper" }, 8), mold: "kubejs:createtaczrecipe_metal_blank", results: [{ id: "createtaczrecipe:copper_projectile_blank" }] })) commonRegistered++;
+    }
     log(`registered ${commonRegistered} common component recipes`);
     global.createtaczrecipe.definitions.forEach((ammo) => {
       if (!validate(ammo)) return;

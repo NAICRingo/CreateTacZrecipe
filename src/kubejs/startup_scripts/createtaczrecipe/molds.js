@@ -1,4 +1,5 @@
 if (typeof CDGEvents !== "undefined") CDGEvents.molds((event) => {
+  event.create("createtaczrecipe_metal_blank", "CreateTacZrecipe Metal Blank Mold");
   global.createtaczrecipe.defaultCaliberKeys.forEach((key) => {
     const name = global.createtaczrecipe.caliberDisplayNames[key];
     event.create(`createtaczrecipe_${key}_casing`, `${name} Casing Mold`);
