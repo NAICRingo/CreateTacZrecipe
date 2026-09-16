@@ -46,14 +46,14 @@ tagCallback({ add: (tag, value) => {
 recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recipe: recipe }) }) });
 
 const definitions = context.global.createtaczrecipe.definitions;
-check(definitions.length === 28, `expected 28 definitions (22 core + 6 gunpack), got ${definitions.length}`);
-check(recipes.length === (withoutOptional ? 84 : 199), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
-check(new Set(definitions.map((definition) => definition.ammoId)).size === 28, "duplicate AmmoId");
+check(definitions.length === 32, `expected 32 definitions (22 core + 10 gunpack), got ${definitions.length}`);
+check(recipes.length === (withoutOptional ? 92 : 223), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
+check(new Set(definitions.map((definition) => definition.ammoId)).size === 32, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
 for (const definition of definitions) {
   const key = definition.key;
-  const expectedPerCaliber = withoutOptional ? (definition.gunpack ? 2 : 3) : (definition.gunpack ? 6 : 7);
+const expectedPerCaliber = withoutOptional ? (definition.gunpack ? 2 : 3) : (definition.gunpack ? 6 : 7);
   check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === expectedPerCaliber, `${key} must register exactly ${expectedPerCaliber} caliber-specific recipes`);
   for (const tag of [`createtaczrecipe:casings/empty/${key}`, `createtaczrecipe:projectiles/rough/${key}`, `createtaczrecipe:projectiles/polished/${key}`, `createtaczrecipe:cartridges/incomplete/${key}`]) {
     const values = tags.get(tag) || [];
@@ -151,10 +151,32 @@ check(powder22 / 2 >= 0.94 && powder22 / 2 <= 0.96, ".22 WMR batch powder discou
 check((powder22 / 96) / (2 / 100) < 1 && (powder22 / 96) / (2 / 100) > 0.98, ".22 WMR per-round powder must remain a small discount after 96/100 adjustment");
 }
 
-for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_65x50", "cib_9x39mm"]) {
+for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_65x50", "cib_9x39mm", "create_armorer_gas_pistol_ammo", "create_armorer_rbapb", "create_armorer_slap", "cib_18_4"]) {
   const definition = definitions.find((value) => value.key === key);
   check(definition && definition.dynamic && definition.gunpack, `${key} gunpack definition missing`);
   check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === (withoutOptional ? 2 : 6), `${key} must register ${withoutOptional ? 2 : 6} gunpack recipes`);
+}
+
+const expectedGunpackBatches = {
+  create_armorer_gas_pistol_ammo: [8, 60, "create_armorer:gas_pistol_ammo"],
+  create_armorer_rbapb: [8, 32, "create_armorer:rbapb"],
+  create_armorer_slap: [10, 60, "create_armorer:slap"],
+  cib_18_4: [2, 20, "cib:18.4"],
+};
+for (const key of Object.keys(expectedGunpackBatches)) {
+  const definition = definitions.find((value) => value.key === key);
+  const expected = expectedGunpackBatches[key];
+  check(definition.economy.metalUnits === expected[0] && definition.economy.sourceBatch === expected[1], `${key} source economy mismatch`);
+  check(definition.counts.casing === expected[1] && definition.counts.roughBullet === expected[1], `${key} intermediate batch mismatch`);
+  check(definition.ammoId === expected[2], `${key} AmmoId mismatch`);
+}
+if (!withoutOptional) {
+  const slapCasing = recipes.find((entry) => entry.id === "createtaczrecipe:components/create_armorer_slap_casing").recipe;
+  const slapBullet = recipes.find((entry) => entry.id === "createtaczrecipe:components/create_armorer_slap_rough_bullet").recipe;
+  const cib184Bullet = recipes.find((entry) => entry.id === "createtaczrecipe:components/cib_18_4_rough_bullet").recipe;
+  check(slapCasing.ingredients.length === 4 && slapCasing.ingredients.every((value) => value.tag === "c:ingots/copper"), "SLAP casing must use four copper ingots");
+  check(slapBullet.ingredients.length === 6 && slapBullet.ingredients.every((value) => value.tag === "c:ingots/iron"), "SLAP projectile must use six iron ingots");
+  check(cib184Bullet.ingredients.length === 19 && cib184Bullet.ingredients.every((value) => value.tag === "c:nuggets/iron"), "18.4mm projectile must preserve nineteen iron nuggets");
 }
 
 check(!definitions.some((value) => value.key === "cib_58x21" || value.key === "cib_8x22"), "special-economy CIB ammo must remain deferred");

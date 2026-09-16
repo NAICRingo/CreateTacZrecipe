@@ -127,7 +127,8 @@
 `sfms`（MS-Mobius）和 `create_armorer`（Create Armorer）。可稳定按常规金属弹处理的
 枪包定义位于独立启动脚本 `startup_scripts/createtaczrecipe/02_gunpack_catalog.js`，
 不会改变核心 22 种口径。当前已接入 `hamster:compact_ammo`、`hamster:medium_ammo`、
-`hamster:long_ammo`、`cib:32acp`、`cib:65x50` 和 `cib:9x39mm`；`cib:58x21` 与
+`hamster:long_ammo`、`cib:32acp`、`cib:65x50`、`cib:9x39mm`、
+`create_armorer:gas_pistol_ammo`、`create_armorer:rbapb`、`create_armorer:slap` 和 `cib:18.4`；`cib:58x21` 与
 `cib:8x22` 属于有意的低消耗/高产量特殊经济设计，暂不注册。爆炸、燃烧、火箭、能量及特殊弹头变体暂不注册。由于 KubeJS 安全脚本
 不能可靠枚举压缩枪包文件，定义按已确认的测试包目录维护；可用
 `config/createtaczrecipe/gunpack_overrides.json` 的 `disabled` 数组停用单个 key。

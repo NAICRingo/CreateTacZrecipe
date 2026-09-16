@@ -17,7 +17,7 @@ Required dependencies:
 ## Candidate contents
 
 - 22 default TaCZ ammunition production chains.
-- Six audited conventional gun-pack adapters.
+- Ten audited conventional gun-pack adapters.
 - Bundled item and mold registration, tags, recipes, configuration readers,
   translations, item models and original textures.
 - Startup configuration under `config/createtaczrecipe/` when overrides are needed.

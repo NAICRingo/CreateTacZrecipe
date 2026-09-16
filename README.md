@@ -31,8 +31,8 @@ would register the same content twice.
 ## Current content
 
 - 22 TaCZ default ammunition definitions, including 12 Gauge.
-- Six conservative conventional gun-pack adapters for the locally audited CIBR and
-  Gunpowder Revolution AmmoIds.
+- Ten conservative conventional gun-pack adapters for the locally audited CIBR,
+  Gunpowder Revolution and Create Armorer AmmoIds.
 - Reusable metal-blank molding, primers, caliber charges, projectile polishing and
   Create sequenced assembly.
 - Project creative tab, English and Simplified Chinese names, original 16x16 assets,

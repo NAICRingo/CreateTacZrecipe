@@ -31,7 +31,7 @@ const gunpacks = fs.readFileSync(path.join(root, "src/kubejs/startup_scripts/cre
 const defaultKeys = [...startup.matchAll(/\["([a-z0-9_]+)",\s*\d+,\s*\d+,\s*\d+,\s*"(?:light|standard|heavy)"\]/g)].map((m) => m[1]);
 const gunpackIds = [...gunpacks.matchAll(/ammoId:\s*"([^"]+)"/g)].map((m) => m[1]);
 check(defaultKeys.length === 22 && new Set(defaultKeys).size === 22, "default catalog contains 22 unique calibers");
-check(gunpackIds.length === 6 && new Set(gunpackIds).size === 6, "gun-pack catalog contains six unique conventional AmmoIds");
+check(gunpackIds.length === 10 && new Set(gunpackIds).size === 10, "gun-pack catalog contains ten unique conventional AmmoIds");
 check(!gunpacks.includes('ammoId: "cib:58x21"') && !gunpacks.includes('ammoId: "cib:8x22"'), "cib:58x21 and cib:8x22 remain deferred");
 
 const languages = ["en_us", "zh_cn"].map((locale) => JSON.parse(fs.readFileSync(path.join(root, `src/kubejs/assets/createtaczrecipe/lang/${locale}.json`), "utf8")));
