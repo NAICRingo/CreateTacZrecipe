@@ -46,9 +46,9 @@ tagCallback({ add: (tag, value) => {
 recipeCallback({ custom: (recipe) => ({ id: (id) => recipes.push({ id: id, recipe: recipe }) }) });
 
 const definitions = context.global.createtaczrecipe.definitions;
-check(definitions.length === 30, `expected 30 definitions (22 core + 8 gunpack), got ${definitions.length}`);
-check(recipes.length === (withoutOptional ? 88 : 211), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
-check(new Set(definitions.map((definition) => definition.ammoId)).size === 30, "duplicate AmmoId");
+check(definitions.length === 28, `expected 28 definitions (22 core + 6 gunpack), got ${definitions.length}`);
+check(recipes.length === (withoutOptional ? 84 : 199), `unexpected recipe count for optional dependency mode: ${recipes.length}`);
+check(new Set(definitions.map((definition) => definition.ammoId)).size === 28, "duplicate AmmoId");
 check(new Set(recipes.map((entry) => entry.id)).size === recipes.length, "duplicate recipe id");
 
 for (const definition of definitions) {
@@ -78,7 +78,7 @@ check(common.light.type === "create:pressing" && common.light.ingredients.length
 check(common.standard.type === "create:compacting" && common.standard.ingredients.length === 4, "standard charge must require four repeated ingredients");
 check(common.heavy.type === "create:compacting" && common.heavy.ingredients.length === 5 && common.heavy.heat_requirement === "heated", "heavy charge must require five repeated ingredients and heat");
 check(common.primerCompound.type === "create:mixing" && common.primerCompound.results[0].count === 8, "primer compound recipe mismatch");
-check(common.primer.type === "create:pressing" && common.primer.ingredients[0].tag === "createtaczrecipe:materials/primer_compounds", "shared primer recipe mismatch");
+check(common.primer.type === "create:pressing" && common.primer.ingredients[0].tag === "createtaczrecipe:materials/primer_compounds" && common.primer.results[0].count === undefined, "shared primer recipe mismatch");
 check(recipes.filter((entry) => entry.id.endsWith("_primer")).length === 1, "default primer recipe must be registered exactly once");
 check(recipes.filter((entry) => entry.recipe.type === "create:mixing").length === 2, "only loose propellant and primer compound may use basin mixing");
 
@@ -130,21 +130,32 @@ check(casing50.ingredients.length === 60, `.50 BMG casing molding must have 60 i
 check(bullet50.ingredients.length === 63, `.50 BMG bullet molding must have 63 inputs, got ${bullet50.ingredients.length}`);
 
 const ammo9mm = definitions.find((value) => value.key === "9mm");
+const ammo22 = definitions.find((value) => value.key === "22wmr");
 const ammo12g = definitions.find((value) => value.key === "12g");
 check(ammo9mm.processPreset === "conventional" && ammo9mm.operations.length === 4, "9mm conventional sequence changed");
 check(ammo12g.processPreset === "shotgun" && ammo12g.ammoId === "tacz:12g", "12G preset or AmmoId mismatch");
 check(ammo12g.operations.map((step) => step.type).join(",") === "create:deploying,create:deploying,create:deploying,create:cutting,create:pressing", "12G shotgun operation order mismatch");
+check(ammo12g.operations[0].ingredients[1].tag === "createtaczrecipe:materials/primers", "12G primer step mismatch");
+check(ammo12g.operations[1].ingredients[1].item === "createtaczrecipe:12g_propellant_charge", "12G charge step mismatch");
+check(ammo12g.operations[2].ingredients[1].tag === "createtaczrecipe:projectiles/polished/12g", "12G projectile step mismatch");
 const casing12g = recipes.find((entry) => entry.id === "createtaczrecipe:components/12g_casing").recipe;
 const bullet12g = recipes.find((entry) => entry.id === "createtaczrecipe:components/12g_rough_bullet").recipe;
 check(casing12g.ingredients.length === 9 && casing12g.results[0].count === 18, "12G casing balance mismatch");
 check(bullet12g.ingredients.length === 24 && bullet12g.results[0].count === 18, "12G projectile balance mismatch");
 check(bullet12g.ingredients.filter((ingredient) => ingredient.tag === "c:nuggets/iron").length === 18, "12G iron input mismatch");
+check(ammo12g.economy.sourceBatch === 18 && ammo12g.economy.metalUnits === 15 && ammo12g.economy.casingMetalUnits === 9 && ammo12g.economy.bulletMetalUnits === 6, "12G source balance mismatch");
+check(ammo22.economy.sourceBatch === 96 && ammo22.economy.metalUnits === 10 && ammo22.economy.casingMetalUnits + ammo22.economy.bulletMetalUnits === 10, ".22 WMR source balance mismatch");
+check(ammo22.ammoId === "tacz:22wmr", ".22 WMR AmmoId mismatch");
+const powder22 = (ammo22.propellantRecipe.ingredients.length / ammo22.propellantRecipe.results[0].count + 1 / 8) * 96 / 24;
+check(powder22 / 2 >= 0.94 && powder22 / 2 <= 0.96, ".22 WMR batch powder discount mismatch");
+check((powder22 / 96) / (2 / 100) < 1 && (powder22 / 96) / (2 / 100) > 0.98, ".22 WMR per-round powder must remain a small discount after 96/100 adjustment");
 }
 
-for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_58x21", "cib_65x50", "cib_8x22", "cib_9x39mm"]) {
+for (const key of ["hamster_compact_ammo", "hamster_medium_ammo", "hamster_long_ammo", "cib_32acp", "cib_65x50", "cib_9x39mm"]) {
   const definition = definitions.find((value) => value.key === key);
   check(definition && definition.dynamic && definition.gunpack, `${key} gunpack definition missing`);
   check(recipes.filter((entry) => entry.id.startsWith(`createtaczrecipe:molds/${key}_`) || entry.id.startsWith(`createtaczrecipe:components/${key}_`) || entry.id === `createtaczrecipe:ammo/${key}_sequenced_assembly`).length === (withoutOptional ? 2 : 6), `${key} must register ${withoutOptional ? 2 : 6} gunpack recipes`);
 }
 
+check(!definitions.some((value) => value.key === "cib_58x21" || value.key === "cib_8x22"), "special-economy CIB ammo must remain deferred");
 console.log(`CreateTacZrecipe static validation passed: ${definitions.length} definitions, ${recipes.length} recipes, ${tags.size} item tags.`);

@@ -48,9 +48,11 @@ TaCZ powder budget; legacy light/standard/heavy charge IDs remain registered for
 save and gunpack compatibility.
 
 The current isolated test profile also includes the separate
-`02_gunpack_catalog.js` source. It adds only the clearly conventional ammunition
+`02_gunpack_catalog.js` source. It adds six clearly conventional ammunition
 found in the enabled CIBR and Gunpowder Revolution packs; explosive, incendiary,
 rocket, energy and special-payload AmmoIds remain intentionally unregistered.
+The deliberately low-cost `cib:58x21` and `cib:8x22` economies are also deferred
+rather than forced through the generic two-blank production model.
 Gunpack definitions use project-owned intermediate items and the same six-step
 Create/CDG chain as the core catalog. To disable an individual profile without
 touching the core 22 calibers, create `config/createtaczrecipe/gunpack_overrides.json`
